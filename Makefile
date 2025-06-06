@@ -1,26 +1,28 @@
 NAME = miniRT
+MLX_DIR = mlx42-codam
 
 CC = gcc
 CFLAGS = -Wall -Werror -Wextra -Iminilibx-linux
-LDFLAGS = -Lminilibx-linux -lmlx -lXext -lX11 -lm
+LDFLAGS = -L$(MLX_DIR)/build -lmlx42 -lglfw -lXext -lX11 -lm
 
 SRCS = main.c
 
-OBJS = $(SRCS:.c=.o)
-
-MLX_DIR = minilibx-linux
-MLX_LIB = $(MLX_DIR)/libmlx.a
+MLX_BUILD = $(MLX_DIR)/build/Makefile
+MLX_LIB = $(MLX_DIR)/build/libmlx42.a
 
 all: $(MLX_LIB) $(NAME)
 
-$(NAME): $(OBJS) $(MLX_LIB)
-	$(CC) $(OBJS) $(LDFLAGS) -o $(NAME)
+$(NAME): $(SRCS) $(MLX_LIB)
+	$(CC) $(SRCS) $(LDFLAGS) -o $(NAME)
 
-%.o: %.c
-		$(CC) $(CFLAGS) -c $< -o $@
+$(MLX_LIB): $(MLX_BUILD)
+	cd $(MLX_DIR)/build && make
 
-$(MLX_LIB):
-	$(MAKE) -C $(MLX_DIR)
+$(MLX_BUILD): $(MLX_DIR)
+	cd $(MLX_DIR) && cmake -B build
+
+$(MLX_DIR):
+	git clone https://github.com/codam-coding-college/MLX42.git $(MLX_DIR)
 
 clean:
 	rm -f $(OBJS)

@@ -1,4 +1,13 @@
-#include "minilibx-linux/mlx.h"
+#include "mlx42-codam/include/MLX42/MLX42.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define WIDTH 512
+#define HEIGHT 512
+
+static mlx_image_t* image;
 
 typedef struct s_color
 {
