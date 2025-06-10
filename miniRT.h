@@ -1,11 +1,16 @@
-#include "mlx42-codam/include/MLX42/MLX42.h"
+#ifndef MINIRT_H
+# define MINIRT_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-
-#define WIDTH 512
-#define HEIGHT 512
+# include <string.h>
+# include "lib/libft/libft.h"
+# include "gnl/get_next_line.h"
+# include "mlx42-codam/include/MLX42/MLX42.h"
+# include <unistd.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <fcntl.h>
+# define WIDTH 512
+# define HEIGHT 512
 
 static mlx_image_t* image;
 
@@ -66,4 +71,36 @@ typedef struct s_cylinder
 	t_color	color;
 }	t_cy;
 
+typedef struct s_scene
+{
+	t_amb_light	ambient;
+	t_camera	camera;
+	t_light		light;
+	int			has_light;
+	t_sphere	*spheres;
+	int			num_spheres;
+	t_plane		*planes;
+	int			num_planes;
+	t_cylinder	*cylinders;
+	int			num_cylinders;
+}	t_scene;
 
+void	init_scene(t_scene *scene);
+int		init_ambient(char *line, t_scene *scene);
+int		init_camera(char *line, t_scene *scene);
+int		init_light(char *line, t_scene *scene);
+int		init_sphere(char *line, t_scene *scene);
+int		init_plane(char *line, t_scene *scene);
+int		init_cylinder(char *line, t_scene *scene);
+
+int		check_args(int argc, char *argv);
+int		parse_rt_file(char *filename, t_scene *scene);
+int		parse_color(char *str, t_color *color);
+int		parse_vector(char *str, t_vec3 *vec, int is_vec);
+
+int		ft_error(char *message);
+void	free_split(char **split);
+void	free_scene(t_scene *scene);
+double	ft_atof(char *str);
+
+#endif

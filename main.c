@@ -49,7 +49,11 @@ void ft_hook(void* param)
 int32_t main(void)
 {
 	mlx_t* mlx;
+	t_scene	scene;
 
+	if (!check_args(argc, argv[1]) || !parse_rt_file(argv[1], &scene))
+		return (1);
+	free_scene(&scene);
 	// Gotta error check this stuff
 	if (!(mlx = mlx_init(WIDTH, HEIGHT, "MLX42", true)))
 	{
