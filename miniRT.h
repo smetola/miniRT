@@ -12,7 +12,7 @@
 # define WIDTH 512
 # define HEIGHT 512
 
-static mlx_image_t* image;
+extern mlx_image_t* image;
 
 typedef struct s_color
 {
@@ -25,7 +25,7 @@ typedef struct s_ambient_lighting
 {
 	double		ratio;
 	t_color		color;
-}	t_A;
+}	t_amb_light;
 
 typedef struct s_vec3
 {
@@ -37,30 +37,30 @@ typedef struct s_vec3
 typedef struct s_camera
 {
 	t_vec3 coord;
-	t_vec3	ori;
+	t_vec3	orient;
 	int		fov; //º!!
-}	t_C;
+}	t_camera;
 
 typedef struct s_light
 {
 	t_vec3	coord;
 	double	bright;
 	//t_color	color;
-}	t_L;
+}	t_light;
 
 typedef struct s_sphere
 {
 	t_vec3	coord;
 	double	diam;
 	t_color	color;
-}	t_sp;
+}	t_sphere;
 
 typedef struct s_plane
 {
 	t_vec3	coord;
 	t_vec3	ori;
 	t_color	color;
-}	t_pl;
+}	t_plane;
 
 typedef struct s_cylinder
 {
@@ -69,7 +69,7 @@ typedef struct s_cylinder
 	double	diam;
 	double	hgt;
 	t_color	color;
-}	t_cy;
+}	t_cylinder;
 
 typedef struct s_scene
 {

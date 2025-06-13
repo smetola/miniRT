@@ -5,6 +5,8 @@
 // See README in the root project for more information.
 // -----------------------------------------------------------------------------
 
+mlx_image_t* image;
+
 int32_t ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
 {
     return (r << 24 | g << 16 | b << 8 | a);
@@ -46,7 +48,7 @@ void ft_hook(void* param)
 
 // -----------------------------------------------------------------------------
 
-int32_t main(void)
+int32_t main(int argc, char **argv)
 {
 	mlx_t* mlx;
 	t_scene	scene;
