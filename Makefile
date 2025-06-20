@@ -2,18 +2,32 @@ NAME = miniRT
 MLX_DIR = mlx42-codam
 
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra -Iminilibx-linux
-LDFLAGS = -L$(MLX_BUILD) -lmlx42 -lglfw -lXext -lX11 -lm
+CFLAGS = -Wall -Werror -Wextra -I$(MLX_DIR)/include -Ilib/libft
+LDFLAGS = -L$(MLX_BUILD) -lmlx42 -lglfw -lXext -lX11 -lm -Llib/libft -lft
 
-SRCS = main.c
+SRCS = main.c \
+		parsing/init_parse_rt.c parsing/init_elements.c \
+		parsing/init_objects.c parsing/parse_utils.c free.c \
+		gnl/get_next_line.c gnl/get_next_line_utils.c
+
+OBJS = $(SRCS:.c=.o)
+
+LIBFT_DIR = lib/libft
+LIBFT = $(LIBFT_DIR)/libft.a
 
 MLX_BUILD = $(MLX_DIR)/build
 MLX_LIB = $(MLX_BUILD)/libmlx42.a
 
-all: $(MLX_LIB) $(NAME)
+all: $(LIBFT) $(MLX_LIB) $(NAME)
 
-$(NAME): $(SRCS) $(MLX_LIB)
-	$(CC) $(SRCS) $(LDFLAGS) -o $(NAME)
+$(NAME): $(OBJS) $(LIBFT) $(MLX_LIB)
+	$(CC) $(OBJS) $(LDFLAGS) -o $(NAME)
+
+%.o: %.c
+    $(CC) $(CFLAGS) -c $< -o $@
+
+$(LIBFT):
+    $(MAKE) -C $(LIBFT_DIR)
 
 $(MLX_LIB): $(MLX_BUILD)/Makefile
 	cd $(MLX_BUILD) && make
@@ -26,10 +40,12 @@ $(MLX_DIR):
 
 clean:
 	rm -f $(OBJS)
-	$(MAKE) -C $(MLX_DIR) clean
+	$(MAKE) -C $(LIBFT_DIR) clean
+    if [ -d "$(MLX_DIR)/build" ]; then cd $(MLX_DIR)/build && make clean; fi
 
 fclean: clean
 	rm -f $(NAME)
-	$(MAKE) -C $(MLX_DIR) clean
+	$(MAKE) -C $(LIBFT_DIR) fclean
+    if [ -d "$(MLX_DIR)/build" ]; then cd $(MLX_DIR)/build && make clean; fi
 
 re: fclean all
