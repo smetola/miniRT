@@ -24,10 +24,10 @@ $(NAME): $(OBJS) $(LIBFT) $(MLX_LIB)
 	$(CC) $(OBJS) $(LDFLAGS) -o $(NAME)
 
 %.o: %.c
-    $(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(LIBFT):
-    $(MAKE) -C $(LIBFT_DIR)
+	$(MAKE) -C $(LIBFT_DIR)
 
 $(MLX_LIB): $(MLX_BUILD)/Makefile
 	cd $(MLX_BUILD) && make
@@ -41,11 +41,11 @@ $(MLX_DIR):
 clean:
 	rm -f $(OBJS)
 	$(MAKE) -C $(LIBFT_DIR) clean
-    if [ -d "$(MLX_DIR)/build" ]; then cd $(MLX_DIR)/build && make clean; fi
+	if [ -d "$(MLX_DIR)/build" ]; then cd $(MLX_DIR)/build && make clean; fi
 
 fclean: clean
 	rm -f $(NAME)
 	$(MAKE) -C $(LIBFT_DIR) fclean
-    if [ -d "$(MLX_DIR)/build" ]; then cd $(MLX_DIR)/build && make clean; fi
+	if [ -d "$(MLX_DIR)/build" ]; then cd $(MLX_DIR)/build && make clean; fi
 
 re: fclean all

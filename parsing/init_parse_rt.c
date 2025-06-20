@@ -17,7 +17,7 @@ static int	validate_scene(t_scene *scene)
 
 static int	parse_line(char *line, t_scene *scene)
 {
-	if (!line || !*line || *line == '\n')
+	if (!line || !*line || *line == '\n' || *line == '\r')
 		return (1);
 	if (line[0] == 'A' && line[1] == ' ')
 		return (init_ambient(line + 2, scene));

@@ -14,7 +14,7 @@
 
 extern mlx_image_t* image;
 
-typedef struct s_color
+typedef struct s_color //@TODO: borrar, en su lugar parsear todo a uint32_t
 {
 	int	r;
 	int	g;
@@ -84,6 +84,12 @@ typedef struct s_scene
 	t_cylinder	*cylinders;
 	int			num_cylinders;
 }	t_scene;
+
+typedef struct	s_point
+{
+	t_vec3	pos;
+	void	*shape;
+}	t_point;
 
 void	init_scene(t_scene *scene);
 int		init_ambient(char *line, t_scene *scene);
