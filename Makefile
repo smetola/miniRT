@@ -8,6 +8,7 @@ LDFLAGS = -L$(MLX_BUILD) -lmlx42 -lglfw -lXext -lX11 -lm -Llib/libft -lft
 SRCS = main.c \
 		parsing/init_parse_rt.c parsing/init_elements.c \
 		parsing/init_objects.c parsing/parse_utils.c free.c \
+		ray.c vec_op.c \
 		gnl/get_next_line.c gnl/get_next_line_utils.c
 
 OBJS = $(SRCS:.c=.o)

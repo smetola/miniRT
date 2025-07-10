@@ -104,6 +104,15 @@ int		parse_rt_file(char *filename, t_scene *scene);
 int		parse_color(char *str, t_color *color);
 int		parse_vector(char *str, t_vec3 *vec, int is_vec);
 
+t_vec3	vec_normalize(t_vec3 v);
+t_vec3	vec_sub(t_vec3 a, t_vec3 b);
+t_vec3	vec_add(t_vec3 a, t_vec3 b);
+t_vec3	vec_scale(t_vec3 v, double s);
+double	vec_dot(t_vec3 a, t_vec3 b);
+
+t_ray	generate_ray(int x, int y, t_camera cam);
+int 	hit_sphere(t_ray ray, t_sphere *sphere);
+
 int		ft_error(char *message);
 void	free_split(char **split);
 void	free_scene(t_scene *scene);
