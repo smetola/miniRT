@@ -7,27 +7,9 @@
 
 mlx_image_t* image;
 
-int32_t ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
+int32_t ft_pixel(t_color color)
 {
-    return (r << 24 | g << 16 | b << 8 | a);
-}
-
-void ft_randomize(void* param)
-{
-	(void)param;
-	for (uint32_t i = 0; i < image->width; ++i)
-	{
-		for (uint32_t y = 0; y < image->height; ++y)
-		{
-			uint32_t color = ft_pixel(
-				rand() % 0xFF, // R
-				rand() % 0xFF, // G
-				rand() % 0xFF, // B
-				rand() % 0xFF  // A
-			);
-			mlx_put_pixel(image, i, y, color);
-		}
-	}
+    return (color.r << 24 | color.g << 16 | color.b << 8);
 }
 
 void ft_hook(void* param)
@@ -46,25 +28,83 @@ void ft_hook(void* param)
 		image->instances[0].x += 5;
 }
 
-void render_scene(t_scene *scene)
+int	get_sphere_distance(const t_camera origin, const t_shape shape)
+{
+
+}
+
+int	get_plane_distance(const t_camera origin, const t_shape shape)
+{
+
+}
+
+int	get_cylinder_distance(const t_camera origin, const t_shape shape)
+{
+
+}
+
+int	get_distance(const t_camera origin, const t_shape shape)
+{
+	if (shape.type == SPHERE)
+		return (get_sphere_distance(origin, shape));
+	else if (shape.type == PLANE)
+		return (get_plane_distance(origin, shape));
+	else if (shape.type == CYLINDER)
+		return (get_cylinder_distance(origin, shape));
+}
+
+t_shape	*get_ray_shape(const int x, const int y, const t_scene scene)
+{
+	t_shape	*hit;
+	int		dist;
+	int		min;
+	int		i;
+
+	hit = NULL;
+	min = 0;
+	i = 0;
+	while (i < scene.num_shapes)
+	{
+		dist = get_distance(scene.camera, scene.shapes[i]);
+		if (dist < min)
+		{
+			min = dist;
+			hit = scene.shapes + i;
+		}
+		i++;
+	}
+
+	return (hit);
+}
+
+void render_scene(const t_scene scene)
 {
 	int x;
 	int	y;
-	t_ray ray;
-	t_sphere *sphere;
+	t_shape *hit;
+	uint32_t	color;
 
-	sphere = &scene->spheres[0];
 	y = 0;
 	while (y < HEIGHT)
 	{
 		x = 0;
 		while (x < WIDTH)
 		{
-			ray = generate_ray_simple(x, y, scene->camera);
-			if (hit_sphere(ray, sphere))
+			hit = get_ray_shape(x, y, scene);
+			if (!hit) //no collision, use ambient light
+			{
+				color = ft_pixel(scene.ambient.color);
+			}
+			else
+			{
+				color = ft_pixel(hit->color);
+			}
+			mlx_put_pixel(image, x, y, color);
+			//ray = generate_ray_simple(x, y, scene->camera);
+			/*if (hit_sphere(ray, sphere))
 				mlx_put_pixel(image, x, y, ft_pixel(255, 0, 0, 255));
 			else
-				mlx_put_pixel(image, x, y, ft_pixel(0, 0, 0, 255));
+				mlx_put_pixel(image, x, y, ft_pixel(0, 0, 0, 255));*/
 			x++;
 		}
 		y++;
@@ -98,8 +138,7 @@ int32_t main(int argc, char **argv)
 		puts(mlx_strerror(mlx_errno));
 		return(EXIT_FAILURE);
 	}
-	//mlx_loop_hook(mlx, ft_randomize, mlx);
-	render_scene(&scene);
+	render_scene(scene);
 
 	mlx_loop_hook(mlx, ft_hook, mlx);
 	mlx_loop(mlx);

@@ -48,27 +48,38 @@ typedef struct s_light
 	//t_color	color;
 }	t_light;
 
-typedef struct s_sphere
+typedef enum
+{
+	SPHERE,
+	PLANE,
+	CYLINDER
+}	e_type;
+
+typedef struct s_shape
 {
 	t_vec3	coord;
-	double	diam;
 	t_color	color;
+	e_type	type;
+}	t_shape;
+
+typedef struct s_sphere
+{
+	t_shape	shape;
+	double	diam;
 }	t_sphere;
 
 typedef struct s_plane
 {
-	t_vec3	coord;
+	t_shape	shape;
 	t_vec3	ori;
-	t_color	color;
 }	t_plane;
 
 typedef struct s_cylinder
 {
-	t_vec3	coord;
+	t_shape	shape;
 	t_vec3	ori;
 	double	diam;
 	double	hgt;
-	t_color	color;
 }	t_cylinder;
 
 typedef struct s_scene
@@ -77,6 +88,8 @@ typedef struct s_scene
 	t_camera	camera;
 	t_light		light;
 	int			has_light;
+	t_shape		*shapes; // @TODO: merge all 3 into a *shapes array
+	int			num_shapes;
 	t_sphere	*spheres;
 	int			num_spheres;
 	t_plane		*planes;
@@ -109,9 +122,6 @@ t_vec3	vec_sub(t_vec3 a, t_vec3 b);
 t_vec3	vec_add(t_vec3 a, t_vec3 b);
 t_vec3	vec_scale(t_vec3 v, double s);
 double	vec_dot(t_vec3 a, t_vec3 b);
-
-t_ray	generate_ray(int x, int y, t_camera cam);
-int 	hit_sphere(t_ray ray, t_sphere *sphere);
 
 int		ft_error(char *message);
 void	free_split(char **split);
