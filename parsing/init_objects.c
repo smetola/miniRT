@@ -53,7 +53,7 @@ int	init_plane(char *line, t_scene *scene)
 		return (0);
 	pl = &new_planes[scene->num_planes];
 	if (!parse_vector(split[0], &pl->shape.coord, 0)
-		|| !parse_vector(split[1], &pl->ori, 1)
+		|| !parse_vector(split[1], &pl->normal, 1)
 		|| !parse_color(split[2], &pl->shape.color))
 		return (0);
 	scene->planes = new_planes;

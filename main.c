@@ -7,9 +7,9 @@
 
 mlx_image_t* image;
 
-int32_t ft_pixel(t_color color)
+uint32_t ft_pixel(t_color color)
 {
-    return (color.r << 24 | color.g << 16 | color.b << 8);
+    return (color.r << 24 | color.g << 16 | color.b << 8 | 255);
 }
 
 void ft_hook(void* param)
@@ -28,48 +28,43 @@ void ft_hook(void* param)
 		image->instances[0].x += 5;
 }
 
-int	get_sphere_distance(const t_camera origin, const t_shape shape)
-{
-
-}
-
-int	get_plane_distance(const t_camera origin, const t_shape shape)
-{
-
-}
-
-int	get_cylinder_distance(const t_camera origin, const t_shape shape)
-{
-
-}
-
-int	get_distance(const t_camera origin, const t_shape shape)
-{
-	if (shape.type == SPHERE)
-		return (get_sphere_distance(origin, shape));
-	else if (shape.type == PLANE)
-		return (get_plane_distance(origin, shape));
-	else if (shape.type == CYLINDER)
-		return (get_cylinder_distance(origin, shape));
-}
-
 t_shape	*get_ray_shape(const int x, const int y, const t_scene scene)
 {
 	t_shape	*hit;
-	int		dist;
-	int		min;
+	double	dist;
+	double	min;
 	int		i;
 
 	hit = NULL;
-	min = 0;
+	min = 999; //@TODO max value
 	i = 0;
-	while (i < scene.num_shapes)
+	while (i < scene.num_spheres)
 	{
-		dist = get_distance(scene.camera, scene.shapes[i]);
-		if (dist < min)
+		dist = get_sphere_distance(generate_ray(x, y, scene.camera), scene.spheres[i]);
+		if (dist < min && dist > 0)
 		{
 			min = dist;
-			hit = scene.shapes + i;
+			hit = &(scene.spheres + i)->shape;
+		}
+		i++;
+	}
+	while (i < scene.num_planes)
+	{
+		dist = get_plane_distance(generate_ray(x, y, scene.camera), scene.planes[i]);
+		if (dist < min && dist > 0)
+		{
+			min = dist;
+			hit = &(scene.planes + i)->shape;
+		}
+		i++;
+	}
+	while (i < scene.num_cylinders)
+	{
+		dist = get_cylinder_distance(generate_ray(x, y, scene.camera), scene.cylinders[i]);
+		if (dist < min && dist > 0)
+		{
+			min = dist;
+			hit = &(scene.cylinders + i)->shape;
 		}
 		i++;
 	}
@@ -98,6 +93,8 @@ void render_scene(const t_scene scene)
 			else
 			{
 				color = ft_pixel(hit->color);
+				//color = hit->color.b;
+				//printf("Printing %d-%d-%d\n", hit->color.b, hit->color.g, hit->color.r);
 			}
 			mlx_put_pixel(image, x, y, color);
 			//ray = generate_ray_simple(x, y, scene->camera);

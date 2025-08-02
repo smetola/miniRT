@@ -1,5 +1,6 @@
 #ifndef MINIRT_H
 # define MINIRT_H
+# define _USE_MATH_DEFINES
 
 # include <string.h>
 # include "lib/libft/libft.h"
@@ -9,6 +10,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <fcntl.h>
+# include <math.h>
 # define WIDTH 512
 # define HEIGHT 512
 
@@ -34,6 +36,12 @@ typedef struct s_vec3
 	double	z;
 }	t_vec3;
 
+typedef struct s_ray
+{
+	t_vec3	origin;
+	t_vec3	direction;
+}	t_ray;
+
 typedef struct s_camera
 {
 	t_vec3 coord;
@@ -48,18 +56,10 @@ typedef struct s_light
 	//t_color	color;
 }	t_light;
 
-typedef enum
-{
-	SPHERE,
-	PLANE,
-	CYLINDER
-}	e_type;
-
 typedef struct s_shape
 {
 	t_vec3	coord;
 	t_color	color;
-	e_type	type;
 }	t_shape;
 
 typedef struct s_sphere
@@ -71,7 +71,7 @@ typedef struct s_sphere
 typedef struct s_plane
 {
 	t_shape	shape;
-	t_vec3	ori;
+	t_vec3	normal;
 }	t_plane;
 
 typedef struct s_cylinder
@@ -88,8 +88,6 @@ typedef struct s_scene
 	t_camera	camera;
 	t_light		light;
 	int			has_light;
-	t_shape		*shapes; // @TODO: merge all 3 into a *shapes array
-	int			num_shapes;
 	t_sphere	*spheres;
 	int			num_spheres;
 	t_plane		*planes;
@@ -122,6 +120,14 @@ t_vec3	vec_sub(t_vec3 a, t_vec3 b);
 t_vec3	vec_add(t_vec3 a, t_vec3 b);
 t_vec3	vec_scale(t_vec3 v, double s);
 double	vec_dot(t_vec3 a, t_vec3 b);
+double	dot_distance(t_vec3 a, t_vec3 b);
+int	is_empty_vec(t_vec3 v);
+
+t_ray	generate_ray(const int x, const int y, const t_camera cam);
+
+double	get_sphere_distance(const t_ray line, const t_sphere sphere);
+double	get_plane_distance(const t_ray line, const t_plane plane);
+double	get_cylinder_distance(const t_ray line, const t_cylinder cylinder);
 
 int		ft_error(char *message);
 void	free_split(char **split);

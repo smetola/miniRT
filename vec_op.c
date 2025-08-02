@@ -32,3 +32,15 @@ double	vec_dot(t_vec3 a, t_vec3 b)
 {
 	return (a.x * b.x + a.y * b.y + a.z * b.z);
 }
+
+double	dot_distance(t_vec3 a, t_vec3 b)
+{
+	//taken from https://stackoverflow.com/questions/14568249/finding-the-distance-between-2-3d-points
+	// (math.h is allowed)
+	return (hypot(hypot(a.x - b.x, a.y - b.y), a.z - b.z));
+}
+
+int	is_empty_vec(t_vec3 v)
+{
+	return (v.x == 0 && v.y == 0 && v.z == 0);
+}

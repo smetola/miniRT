@@ -25,7 +25,7 @@ Solución: A·t² + B·t + C = 0
 > 0 → Hay 2 puntos → el rayo entra y sale de la esfera
  */
 
-int	hit_sphere(t_ray ray, t_sphere *sphere)
+/*int	hit_sphere(t_ray ray, t_sphere *sphere)
 {
 	t_vec3	oc;
 	double	a;
@@ -44,10 +44,10 @@ int	hit_sphere(t_ray ray, t_sphere *sphere)
 	if (discriminant < 0)
 		return (0);
 	return (1); // choca
-}
+}*/
 
 
-t_ray	generate_ray(int x, int y, t_camera cam)
+t_ray	generate_ray(const int x, const int y, const t_camera cam)
 {
 	t_ray	ray;
 	t_vec3	pixel;
