@@ -58,7 +58,7 @@ typedef struct s_light
 
 typedef struct s_shape
 {
-	t_vec3	coord;
+	t_vec3	ori;
 	t_color	color;
 }	t_shape;
 
@@ -77,7 +77,7 @@ typedef struct s_plane
 typedef struct s_cylinder
 {
 	t_shape	shape;
-	t_vec3	ori;
+	t_vec3	axis;
 	double	diam;
 	double	hgt;
 }	t_cylinder;
@@ -119,9 +119,10 @@ t_vec3	vec_normalize(t_vec3 v);
 t_vec3	vec_sub(t_vec3 a, t_vec3 b);
 t_vec3	vec_add(t_vec3 a, t_vec3 b);
 t_vec3	vec_scale(t_vec3 v, double s);
+t_vec3	vec_prod(t_vec3 a, t_vec3 b);
 double	vec_dot(t_vec3 a, t_vec3 b);
 double	dot_distance(t_vec3 a, t_vec3 b);
-int	is_empty_vec(t_vec3 v);
+int		is_empty_vec(t_vec3 v);
 
 t_ray	generate_ray(const int x, const int y, const t_camera cam);
 
