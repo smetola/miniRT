@@ -132,7 +132,7 @@ t_ray	vec_rotate_by_plane(t_ray target, t_vec3 axis, t_vec3 reference);
 t_ray	generate_ray(const int x, const int y, const t_camera cam);
 
 double	get_ray_to_point_distance(t_ray	ray, t_vec3	point);
-double	get_sphere_distance(const t_ray line, const t_sphere sphere);
+double	get_sphere_distance(t_ray line, const t_sphere sphere);
 double	get_plane_distance(t_ray line, const t_plane plane);
 double	get_cylinder_distance(const t_ray line, const t_cylinder cylinder);
 

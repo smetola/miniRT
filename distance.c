@@ -56,13 +56,6 @@ double	get_ray_to_point_distance(t_ray	ray, t_vec3	point)
 	return (point_distance(hit, point));
 }
 
-double	get_sphere_distance(const t_ray line, const t_sphere sphere)
-{
-	(void)line;
-	(void)sphere;
-	return -1;
-}
-
 /*double	get_plane_distance(const t_ray line, const t_plane plane)
 {
 	//taken from https://stackoverflow.com/questions/7168484/3d-line-segment-and-plane-intersection
@@ -93,6 +86,35 @@ double	get_plane_distance(t_ray line, const t_plane plane)
 		return (-1);
 	double x = -line.origin.y/line.direction.y;
 	t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, x));
+	if (!is_point_ahead(line, hit)) //behind the screen, not valid
+		return (-1);
+	return	(point_distance(hit, line.origin));
+}
+
+double	get_sphere_distance(t_ray line, const t_sphere sphere)
+{
+	line.origin = vec_sub(line.origin, sphere.shape.ori);
+	line.origin = vec_scale(line.origin, 1 / sphere.diam);
+	//scale direction vector as well so distance is properly calculated at the end, not multiplied by sphere size (this doesnt seem to work tho)
+	//line.direction = vec_scale(line.direction, 1 / sphere.diam);
+	//no rotation transform, as a one color sphere is gonna be the same from all angles
+	double	divisor = vec_dot(line.direction, line.direction);
+	if (divisor == 0) //divide by 0, no solution //todo epsilon compare
+		return (-1);
+	double	x = 2 * vec_dot(line.direction, line.origin);
+	double	discriminant = x * x - 4 * divisor * (vec_dot(line.origin, line.origin) - 1);
+	if (discriminant < 0) //root square of negative number, no solution
+		return (-1);
+	double	distance;
+	if (discriminant == 0) //todo epsilon compareW
+		distance = -x / (2 * divisor);
+	else
+	{
+		double	d1 = (-x + sqrt(discriminant)) / (2 * divisor);
+		double	d2 = (-x - sqrt(discriminant)) / (2 * divisor);
+		distance = min_distance(d1, d2);
+	}
+	t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, distance * sphere.diam)); //scale final hit to sphere scale
 	if (!is_point_ahead(line, hit)) //behind the screen, not valid
 		return (-1);
 	return	(point_distance(hit, line.origin));
