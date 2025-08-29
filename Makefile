@@ -5,6 +5,7 @@ CC = gcc
 CFLAGS = -Wall -Werror -Wextra -I$(MLX_DIR)/include -Ilib/libft -lm
 LDFLAGS = -L$(MLX_BUILD) -lmlx42 -lglfw -lXext -lX11 -lm -Llib/libft -lft
 
+HDRS = miniRT.h
 SRCS = main.c \
 		parsing/init_parse_rt.c parsing/init_elements.c \
 		parsing/init_objects.c parsing/parse_utils.c free.c \
@@ -21,7 +22,7 @@ MLX_LIB = $(MLX_BUILD)/libmlx42.a
 
 all: $(LIBFT) $(MLX_LIB) $(NAME)
 
-$(NAME): $(OBJS) $(LIBFT) $(MLX_LIB)
+$(NAME): $(HDRS) $(OBJS) $(LIBFT) $(MLX_LIB)
 	$(CC) $(OBJS) $(LDFLAGS) -o $(NAME)
 
 %.o: %.c

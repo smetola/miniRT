@@ -11,10 +11,12 @@
 # include <stdlib.h>
 # include <fcntl.h>
 # include <math.h>
+
 # define WIDTH 512
 # define HEIGHT 512
+# define EPSILON 0.001
 
-extern mlx_image_t* image;
+//extern mlx_image_t* image;
 
 typedef struct s_color //@TODO: borrar, en su lugar parsear todo a uint32_t
 {
@@ -41,6 +43,12 @@ typedef struct s_ray
 	t_vec3	origin;
 	t_vec3	direction;
 }	t_ray;
+
+typedef struct s_matrix
+{
+	int	size;
+	double	**m;
+}	t_matrix;
 
 typedef struct s_camera
 {
@@ -96,12 +104,6 @@ typedef struct s_scene
 	int			num_cylinders;
 }	t_scene;
 
-typedef struct	s_point
-{
-	t_vec3	pos;
-	void	*shape;
-}	t_point;
-
 void	init_scene(t_scene *scene);
 int		init_ambient(char *line, t_scene *scene);
 int		init_camera(char *line, t_scene *scene);
@@ -118,16 +120,20 @@ int		parse_vector(char *str, t_vec3 *vec, int is_vec);
 t_vec3	vec_normalize(t_vec3 v);
 t_vec3	vec_sub(t_vec3 a, t_vec3 b);
 t_vec3	vec_add(t_vec3 a, t_vec3 b);
+t_vec3	vec_reverse(t_vec3 v);
 t_vec3	vec_scale(t_vec3 v, double s);
 t_vec3	vec_prod(t_vec3 a, t_vec3 b);
 double	vec_dot(t_vec3 a, t_vec3 b);
-double	dot_distance(t_vec3 a, t_vec3 b);
+double	point_distance(t_vec3 a, t_vec3 b);
 int		is_empty_vec(t_vec3 v);
+
+t_ray	vec_rotate_by_plane(t_ray target, t_vec3 axis, t_vec3 reference);
 
 t_ray	generate_ray(const int x, const int y, const t_camera cam);
 
+double	get_ray_to_point_distance(t_ray	ray, t_vec3	point);
 double	get_sphere_distance(const t_ray line, const t_sphere sphere);
-double	get_plane_distance(const t_ray line, const t_plane plane);
+double	get_plane_distance(t_ray line, const t_plane plane);
 double	get_cylinder_distance(const t_ray line, const t_cylinder cylinder);
 
 int		ft_error(char *message);

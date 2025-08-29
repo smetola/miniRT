@@ -7,9 +7,16 @@
 
 mlx_image_t* image;
 
-uint32_t ft_pixel(t_color color)
+uint32_t ft_pixel(t_color color, int32_t a)
 {
-    return (color.r << 24 | color.g << 16 | color.b << 8 | 255);
+    return (color.r << 24 | color.g << 16 | color.b << 8 | a);
+}
+
+int32_t	ft_map(double x, double in_max, int32_t out_max) //out_min and in_min is 0
+{
+	if (x > in_max)
+		return (out_max);
+	return (x * out_max / in_max);
 }
 
 void ft_hook(void* param)
@@ -48,16 +55,18 @@ t_shape	*get_ray_shape(const int x, const int y, const t_scene scene)
 		}
 		i++;
 	}
+	i = 0;
 	while (i < scene.num_planes)
 	{
 		dist = get_plane_distance(generate_ray(x, y, scene.camera), scene.planes[i]);
-		if (dist < min && dist > 0)
+		if (dist < min && dist > 0) //&& dist = 0?
 		{
 			min = dist;
 			hit = &(scene.planes + i)->shape;
 		}
 		i++;
 	}
+	i = 0;
 	while (i < scene.num_cylinders)
 	{
 		dist = get_cylinder_distance(generate_ray(x, y, scene.camera), scene.cylinders[i]);
@@ -88,11 +97,13 @@ void render_scene(const t_scene scene)
 			hit = get_ray_shape(x, y, scene);
 			if (!hit) //no collision, use ambient light
 			{
-				color = ft_pixel(scene.ambient.color);
+				//double	d = get_ray_to_point_distance(generate_ray(x, y, scene.camera), scene.light.coord); //max of about 35700 (40k?) maybe max(min) brightness should be 10k, and anything above that, map to int 255
+				//color = ft_pixel(scene.ambient.color, ft_map(d, 5000, 255));
+				color = ft_pixel(scene.ambient.color, 25); //map scene.ambient.ratio to 0~255 in second argument
 			}
 			else
 			{
-				color = ft_pixel(hit->color);
+				color = ft_pixel(hit->color, 255);
 				//color = hit->color.b;
 				//printf("Printing %d-%d-%d\n", hit->color.b, hit->color.g, hit->color.r);
 			}
