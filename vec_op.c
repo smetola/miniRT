@@ -55,6 +55,11 @@ double	point_distance(t_vec3 a, t_vec3 b)
 	return (hypot(hypot(a.x - b.x, a.y - b.y), a.z - b.z));
 }
 
+double	point_to_plane_distance(t_vec3 point, t_plane plane)
+{
+	return	vec_dot(plane.normal, vec_sub(point, plane.shape.ori));
+}
+
 double	vec_length(t_vec3 v)
 {
 	return (sqrt(pow(v.x, 2) + pow(v.y, 2) + pow(v.z, 2)));
@@ -90,17 +95,24 @@ t_ray	vec_rotate_by_plane(t_ray target, t_vec3 axis, t_vec3 reference)
 
 	i think i need to rotate both target.origin and target.direction?*/
 
+	double	x_angle;
+	double	z_angle;
 	t_vec3	temp_axis = axis;
 	t_vec3	temp_ref = reference;
 	temp_axis.x = 0;
-	temp_ref.x = 0;
-	double x_angle = acos(vec_dot(temp_axis, temp_ref)/(vec_length(temp_axis)*vec_length(temp_ref)));
+	if (vec_length(temp_axis) < EPSILON)
+		x_angle = 0; //no rotation??
+	else
+	{
+		temp_ref.x = 0;
+		x_angle = acos(vec_dot(temp_axis, temp_ref)/(vec_length(temp_axis)*vec_length(temp_ref)));
+	}
 
 	temp_axis = axis;
 	temp_ref = reference;
 	temp_axis.z = 0;
 	temp_ref.z = 0;
-	double z_angle = acos(vec_dot(temp_axis, temp_ref)/(vec_length(temp_axis)*vec_length(temp_ref)));
+	z_angle = acos(vec_dot(temp_axis, temp_ref)/(vec_length(temp_axis)*vec_length(temp_ref)));
 
 	//x axis
 	target.origin.y = cos(x_angle)*target.origin.y - sin(x_angle)*target.origin.z;

@@ -56,38 +56,34 @@ double	get_ray_to_point_distance(t_ray	ray, t_vec3	point)
 	return (point_distance(hit, point));
 }
 
-/*double	get_plane_distance(const t_ray line, const t_plane plane)
-{
-	//taken from https://stackoverflow.com/questions/7168484/3d-line-segment-and-plane-intersection
-	double	d;
-
-	if (vec_dot(plane.normal, line.direction) == 0) //paralelo al plano, nunca intersecan
-		return (-1);
-	d = vec_dot(plane.normal, plane.shape.ori); //todos los puntos X del plano cumplen la ecuacion vec_dot(plane.normal, X) = d
-	float x = (d - vec_dot(plane.normal, line.origin)) / vec_dot(plane.normal, line.direction);
-	t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, x));
-	if (!is_point_ahead(line, hit)) //behind the screen, not valid
-		return (-1);
-	return	(point_distance(hit, line.origin));
-}*/
-
 double	get_plane_distance(t_ray line, const t_plane plane)
 {
-	//@TODO idk why, but if the plane point.y is 0, the plane is never detected, there is still some tweaking to do here
 
 	//transform line before calculating intersection
+	double	height = point_to_plane_distance(line.origin, plane);
 	line = vec_rotate_by_plane(line, plane.normal, (t_vec3){0, 1, 0});
-	//@TODO rotate plane point also? idk
-	line.origin.y -= plane.shape.ori.y; //with an xz plane, translation only matters in y axis? i think this is the wrong part, it cant be any point of the plane as reference
 	if (line.direction.y == 0) //paralelo al plano, nunca intersecan
 		return (-1);
 	//si el plano está debajo y miras arriba, no se ve. lo mismo si inviertes el eje y
-	if ((plane.shape.ori.y > line.origin.y && line.direction.y < 0) || (plane.shape.ori.y < line.origin.y && line.direction.y > 0))
+	//if ((height < 0 && line.direction.y < 0) || (height > 0 && line.direction.y > 0))
+	if (height > 0 && line.direction.y < 0)
+	{
+		printf("%lf heh\n", height);
 		return (-1);
+	}
+	else if (height < 0 && line.direction.y > 0)
+	{
+		printf("%lf jej\n", height);
+		return (-1);
+	}
+	//line.origin.y -= height;
 	double x = -line.origin.y/line.direction.y;
 	t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, x));
 	if (!is_point_ahead(line, hit)) //behind the screen, not valid
+	{
+		printf("hpla\n");
 		return (-1);
+	}
 	return	(point_distance(hit, line.origin));
 }
 
@@ -106,13 +102,13 @@ double	get_sphere_distance(t_ray line, const t_sphere sphere)
 	if (discriminant < 0) //root square of negative number, no solution
 		return (-1);
 	double	distance;
-	if (discriminant == 0) //todo epsilon compareW
+	if (discriminant == 0) //todo epsilon compare
 		distance = -x / (2 * divisor);
 	else
 	{
 		double	d1 = (-x + sqrt(discriminant)) / (2 * divisor);
 		double	d2 = (-x - sqrt(discriminant)) / (2 * divisor);
-		distance = min_distance(d1, d2);
+		distance = min_distance(d1, d2); //@TODO: this comparison is wrong? distance can be negative
 	}
 	t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, distance * sphere.diam)); //scale final hit to sphere scale
 	if (!is_point_ahead(line, hit)) //behind the screen, not valid
@@ -120,70 +116,69 @@ double	get_sphere_distance(t_ray line, const t_sphere sphere)
 	return	(point_distance(hit, line.origin));
 }
 
-double	get_cylinder_body_hit_distance(const t_ray line, const t_cylinder cylinder, const t_vec3 hit)
-{
-	if (!is_point_ahead(line, hit))
-		return (-1);
-	double	body_distance = vec_dot(cylinder.axis, vec_sub(hit, cylinder.shape.ori)); //distance from cylinder origin to hit, aligned with cylinder axis
-	if (body_distance < 0 || body_distance > cylinder.hgt) //not within cylinder height, miss
-		return (-1);
-	return (point_distance(hit, line.origin));
+double	check_cylinder_height(t_ray line, double distance, double height)
+{ //constrain final result to finite cylinder height
+	double	hit_height = line.origin.y + distance * line.direction.y;
+	if (fabs(hit_height) < height)
+		return (hit_height);
+	return (-1);
 }
 
-double	get_cylinder_body_distance(const t_ray line, const t_cylinder cylinder)
+double	check_cap(t_ray line, double t, double radius)
 {
-	t_vec3	divisor_vec;
-	double	divisor;
-	double	prefix;
-	double	incog;
+	double	x = line.origin.x + t * line.direction.x;
+	double	z = line.origin.z + t * line.direction.z;
+	return (pow(x, 2) + pow(z, 2) <= radius); //if the line distance traveled in plane xz is higher than radius within cylinder height, its not a hit
+}
 
-	divisor_vec = vec_prod(line.direction, cylinder.axis);
-	if (is_empty_vec(divisor_vec))
-		return (-1); //divison by zero, no solutions
-	divisor = vec_dot(divisor_vec, divisor_vec);
-	prefix = vec_dot(divisor_vec, vec_prod(cylinder.shape.ori, cylinder.axis));
-	incog = vec_dot(cylinder.axis, cylinder.axis) * pow(vec_dot(cylinder.shape.ori, divisor_vec), 2);
-	incog = divisor * pow(cylinder.diam/2, 2) - incog;
-	if (incog < 0) //sqrt of negative, no solutions
+double	get_cylinder_caps_distance(const t_ray line, const t_cylinder cylinder)
+{
+	//check lower cap
+	double	t_low = (-cylinder.hgt - line.origin.y) / line.direction.y; //cylinder height is doubled? (value of 1 means it extends 1 unit in both +y and -y, or that higher cap is y=height and lower cap is y=-height)
+	//check higher cap
+	double	t_high = (cylinder.hgt - line.origin.y) / line.direction.y;
+	if (check_cap(line, t_low, cylinder.diam))
+	{//lower cap is hit
+		if (check_cap(line, t_high, cylinder.diam))
+			return (min_distance(t_low, t_high));
+		else
+			return (t_low);
+	}
+	else
+	{//no hit on lower cap
+		if (check_cap(line, t_high, cylinder.diam))
+			return (t_high);
+	}
+	return (-1);
+}
+
+double	get_cylinder_distance(t_ray line, const t_cylinder cylinder)
+{
+	line.origin = vec_sub(line.origin, cylinder.shape.ori);
+	//line.origin = vec_scale(line.origin, 1 / cylinder.diam);
+	//scale direction vector as well so distance is properly calculated at the end, not multiplied by cylinder size (this doesnt seem to work tho)
+	//line.direction = vec_scale(line.direction, 1 / cylinder.diam);
+	//@TODO rotation transform
+	double	divisor = pow(line.direction.x, 2) + pow(line.direction.z, 2);
+	if (divisor == 0) //divide by 0, no solution //todo epsilon compare
 		return (-1);
-	else if (incog == 0) //one solution
-		return get_cylinder_body_hit_distance(line, cylinder, vec_scale(line.direction, prefix / divisor));
+	double	x = 2 * pow(line.origin.x, 2) + 2 * pow(line.origin.z, 2);
+	double	discriminant = x * x - 4 * divisor * (pow(line.origin.x, 2) + pow(line.origin.z, 2) - 1);
+	if (discriminant < 0) //root square of negative number, no solution
+		return (-1);
+	double	distance;
+	if (discriminant == 0) //todo epsilon compare
+		distance = check_cylinder_height(line, (-x / (2 * divisor)), cylinder.hgt);
 	else
 	{
-		double	d1 = get_cylinder_body_hit_distance(line, cylinder, vec_scale(line.direction, (prefix + sqrt(incog)) / divisor));
-		double	d2 = get_cylinder_body_hit_distance(line, cylinder, vec_scale(line.direction, (prefix - sqrt(incog)) / divisor));
-		return (min_distance(d1, d2));
+		double	d1 = check_cylinder_height(line, ((-x + sqrt(discriminant)) / (2 * divisor)), cylinder.hgt);
+		double	d2 = check_cylinder_height(line, ((-x - sqrt(discriminant)) / (2 * divisor)), cylinder.hgt);
+		distance = min_distance(d1, d2);
 	}
-}
-
-double	get_cylinder_base_hit_distance(const t_ray line, const t_vec3 ori, const double diam, const t_vec3 hit)
-{
-	if (!is_point_ahead(line, hit))
+	//distance = min_distance(distance, get_cylinder_caps_distance(line, cylinder));
+	t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, distance));
+	//t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, distance * cylinder.diam)); //scale final hit to cylinder scale
+	if (!is_point_ahead(line, hit)) //behind the screen, not valid
 		return (-1);
-	t_vec3	aux = vec_sub(hit, ori);
-	double	base_distance = vec_dot(aux, aux); //distance from cylinder base origin to hit, within base plane
-	if (base_distance >= pow(diam/2, 2.12)) //not within base circumference, miss (should be 2 and not 2.12, but idk)
-		return (-1);
-	return (point_distance(hit, line.origin));
-}
-
-double	get_cylinder_base_distance(const t_ray line, const t_cylinder cylinder)
-{
-	t_vec3	ori2 = vec_add(cylinder.shape.ori, vec_scale(cylinder.axis, cylinder.hgt)); //cylinder.shape.ori is the center point of one of the bases, ori2 is the other
-	double	divisor = vec_dot(line.direction, cylinder.axis);
-	if (divisor == 0) //line is parallel to base planes, not solvable
-		return (-1);
-	double	d1 = get_cylinder_base_hit_distance(line, cylinder.shape.ori, cylinder.diam, vec_scale(line.direction, vec_dot(cylinder.shape.ori, cylinder.axis) / divisor));
-	double	d2 = get_cylinder_base_hit_distance(line, ori2, cylinder.diam, vec_scale(line.direction, vec_dot(ori2, cylinder.axis) / divisor));
-	return (min_distance(d1, d2));
-}
-
-double	get_cylinder_distance(const t_ray line, const t_cylinder cylinder)
-{
-	double	d1;
-	double	d2;
-
-	d1 = get_cylinder_body_distance(line, cylinder);
-	d2 = get_cylinder_base_distance(line, cylinder);
-	return (min_distance(d1, d2));
+	return	(point_distance(hit, line.origin));
 }

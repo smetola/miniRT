@@ -125,6 +125,7 @@ t_vec3	vec_scale(t_vec3 v, double s);
 t_vec3	vec_prod(t_vec3 a, t_vec3 b);
 double	vec_dot(t_vec3 a, t_vec3 b);
 double	point_distance(t_vec3 a, t_vec3 b);
+double	point_to_plane_distance(t_vec3 point, t_plane plane);
 int		is_empty_vec(t_vec3 v);
 
 t_ray	vec_rotate_by_plane(t_ray target, t_vec3 axis, t_vec3 reference);
