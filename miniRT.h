@@ -129,6 +129,7 @@ double	point_to_plane_distance(t_vec3 point, t_plane plane);
 int		is_empty_vec(t_vec3 v);
 
 t_ray	vec_rotate_by_plane(t_ray target, t_vec3 axis, t_vec3 reference);
+t_ray	vec_full_rotate(t_ray target, t_vec3 axis, t_vec3 reference);
 
 t_ray	generate_ray(const int x, const int y, const t_camera cam);
 

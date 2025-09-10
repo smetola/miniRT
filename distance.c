@@ -60,30 +60,21 @@ double	get_plane_distance(t_ray line, const t_plane plane)
 {
 
 	//transform line before calculating intersection
-	double	height = point_to_plane_distance(line.origin, plane);
+	double	height = point_to_plane_distance(line.origin, plane); //y origin coordinate of ray is equal to distance of origin to the plane
 	line = vec_rotate_by_plane(line, plane.normal, (t_vec3){0, 1, 0});
 	if (line.direction.y == 0) //paralelo al plano, nunca intersecan
 		return (-1);
 	//si el plano está debajo y miras arriba, no se ve. lo mismo si inviertes el eje y
 	//if ((height < 0 && line.direction.y < 0) || (height > 0 && line.direction.y > 0))
-	if (height > 0 && line.direction.y < 0)
-	{
-		printf("%lf heh\n", height);
+	if (height > 0 && line.direction.y > 0)
 		return (-1);
-	}
-	else if (height < 0 && line.direction.y > 0)
-	{
-		printf("%lf jej\n", height);
+	if (height < 0 && line.direction.y < 0)
 		return (-1);
-	}
 	//line.origin.y -= height;
-	double x = -line.origin.y/line.direction.y;
+	double x = -height/line.direction.y;
 	t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, x));
 	if (!is_point_ahead(line, hit)) //behind the screen, not valid
-	{
-		printf("hpla\n");
 		return (-1);
-	}
 	return	(point_distance(hit, line.origin));
 }
 
@@ -158,21 +149,23 @@ double	get_cylinder_distance(t_ray line, const t_cylinder cylinder)
 	//line.origin = vec_scale(line.origin, 1 / cylinder.diam);
 	//scale direction vector as well so distance is properly calculated at the end, not multiplied by cylinder size (this doesnt seem to work tho)
 	//line.direction = vec_scale(line.direction, 1 / cylinder.diam);
-	//@TODO rotation transform
+	line = vec_full_rotate(line, cylinder.axis, (t_vec3) {0, 1, 0});
 	double	divisor = pow(line.direction.x, 2) + pow(line.direction.z, 2);
 	if (divisor == 0) //divide by 0, no solution //todo epsilon compare
 		return (-1);
-	double	x = 2 * pow(line.origin.x, 2) + 2 * pow(line.origin.z, 2);
+	double	x = 2 * line.origin.x * line.direction.x + 2 * line.origin.z * line.direction.z;
 	double	discriminant = x * x - 4 * divisor * (pow(line.origin.x, 2) + pow(line.origin.z, 2) - 1);
 	if (discriminant < 0) //root square of negative number, no solution
 		return (-1);
 	double	distance;
 	if (discriminant == 0) //todo epsilon compare
-		distance = check_cylinder_height(line, (-x / (2 * divisor)), cylinder.hgt);
+		distance = check_cylinder_height(line, (-x / (2 * divisor)), cylinder.hgt / 2);
 	else
 	{
-		double	d1 = check_cylinder_height(line, ((-x + sqrt(discriminant)) / (2 * divisor)), cylinder.hgt);
-		double	d2 = check_cylinder_height(line, ((-x - sqrt(discriminant)) / (2 * divisor)), cylinder.hgt);
+		//double	d1 = check_cylinder_height(line, ((-x + sqrt(discriminant)) / (2 * divisor)), cylinder.hgt);
+		//double	d2 = check_cylinder_height(line, ((-x - sqrt(discriminant)) / (2 * divisor)), cylinder.hgt);
+		double	d1 = check_cylinder_height(line, ((-x + sqrt(discriminant)) / (2 * divisor)), cylinder.hgt / 2);
+		double	d2 = check_cylinder_height(line, ((-x - sqrt(discriminant)) / (2 * divisor)), cylinder.hgt / 2);
 		distance = min_distance(d1, d2);
 	}
 	//distance = min_distance(distance, get_cylinder_caps_distance(line, cylinder));
