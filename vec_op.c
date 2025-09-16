@@ -132,80 +132,22 @@ t_ray	vec_rotate_by_plane(t_ray target, t_vec3 axis, t_vec3 reference)
 	return	(target);
 }
 
-t_ray	vec_full_rotate(t_ray target, t_vec3 axis, t_vec3 reference)
+t_vec3	rotate_rodrigues(t_vec3 target, t_vec3 axis, double angle)
 {
-	/*
-	for cylinder hit detection, reference will be (0, 1, 0), and for the camera rotation, (0, 0, 1)
+	t_vec3	term1 = vec_scale(target, cos(angle));
+	t_vec3	term2 = vec_scale(vec_prod(axis, target), sin(angle));
+	t_vec3	term3 = vec_scale(axis, vec_dot(axis, target) * (1 - cos(angle)));
+	return (vec_add(term1, vec_add(term2, term3)));
+}
 
-	X axis
-	y' = cos(r)*y - sin(r)*z;
-	z' = sin(r)*y + cos(r)*z;
-
-	Y axis
-	x' = cos(r)*x + sin(r)*z;
-	z' = -sin(r)*x + cos(r)*z;
-
-	Z axis
-	x' = cos(r)*x - sin(r)*y;
-	y' = sin(r)*x + cos(r)*y;*/
-
-	double	x_angle;
-	double	y_angle;
-	double	z_angle;
-
-	t_vec3	temp_axis = axis;
-	t_vec3	temp_ref = reference;
-	temp_axis.x = 0;
-	temp_ref.x = 0;
-	if (is_empty_vec(temp_axis) || is_empty_vec(temp_ref))
-		x_angle = 0;
-	else
-		x_angle = acos(vec_dot(temp_axis, temp_ref)/(vec_length(temp_axis)*vec_length(temp_ref)));
-
-	temp_axis = axis;
-	temp_ref = reference;
-	temp_axis.y = 0;
-	temp_ref.y = 0;
-	if (is_empty_vec(temp_axis) || is_empty_vec(temp_ref))
-		y_angle = 0;
-	else
-		y_angle = acos(vec_dot(temp_axis, temp_ref)/(vec_length(temp_axis)*vec_length(temp_ref)));
-
-	temp_axis = axis;
-	temp_ref = reference;
-	temp_axis.z = 0;
-	temp_ref.z = 0;
-	if (is_empty_vec(temp_axis) || is_empty_vec(temp_ref))
-		z_angle = 0;
-	else
-		z_angle = acos(vec_dot(temp_axis, temp_ref)/(vec_length(temp_axis)*vec_length(temp_ref)));
-
-	//x axis
-	if (x_angle != 0)
-	{
-		target.origin.y = cos(x_angle)*target.origin.y - sin(x_angle)*target.origin.z;
-		target.direction.y = cos(x_angle)*target.direction.y - sin(x_angle)*target.direction.z;
-
-		target.origin.z = sin(x_angle)*target.origin.y + cos(x_angle)*target.origin.z;
-		target.direction.z = sin(x_angle)*target.direction.y + cos(x_angle)*target.direction.z;
-	}
-	//y axis
-	if (y_angle != 0)
-	{
-		target.origin.x = cos(y_angle)*target.origin.x + sin(y_angle)*target.origin.z;
-		target.direction.x = cos(y_angle)*target.direction.x + sin(y_angle)*target.direction.z;
-
-		target.origin.z = -sin(y_angle)*target.origin.x + cos(y_angle)*target.origin.z;
-		target.direction.z = -sin(y_angle)*target.direction.x + cos(y_angle)*target.direction.z;
-	}
-	//z axis
-	if (z_angle != 0)
-	{
-		target.origin.x = cos(z_angle)*target.origin.x - sin(z_angle)*target.origin.y;
-		target.direction.x = cos(z_angle)*target.direction.x - sin(z_angle)*target.direction.y;
-
-		target.origin.y = sin(z_angle)*target.origin.x + cos(z_angle)*target.origin.y;
-		target.direction.y = sin(z_angle)*target.direction.x + cos(z_angle)*target.direction.y;
-	}
-	return	(target);
+t_ray	vec_cylinder_rotate(t_ray target, t_cylinder cylinder)
+{
+	//rodrigues formula
+	t_vec3	up = {0, 1, 0};
+	t_vec3	axis = vec_normalize(vec_prod(cylinder.axis, up)); //axis of rotation is perpendicular to both cylinder axis and up axis
+	double	angle = acos(vec_dot(cylinder.axis, up));
+	target.origin = rotate_rodrigues(vec_sub(target.origin, cylinder.shape.ori), axis, angle);
+	//target.origin = rotate_rodrigues(target.origin, axis, angle);
+	target.direction = rotate_rodrigues(target.direction, axis, angle);
+	return (target);
 }

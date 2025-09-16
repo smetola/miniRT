@@ -125,36 +125,36 @@ double	check_cap(t_ray line, double t, double radius)
 double	get_cylinder_caps_distance(const t_ray line, const t_cylinder cylinder)
 {
 	//check lower cap
-	double	t_low = (-cylinder.hgt - line.origin.y) / line.direction.y; //cylinder height is doubled? (value of 1 means it extends 1 unit in both +y and -y, or that higher cap is y=height and lower cap is y=-height)
+	double	t_low = (- line.origin.y) / line.direction.y; //cylinder height is doubled? (value of 1 means it extends 1 unit in both +y and -y, or that higher cap is y=height and lower cap is y=-height)
 	//check higher cap
-	double	t_high = (cylinder.hgt - line.origin.y) / line.direction.y;
+	double	t_high = (cylinder.hgt / 2 - line.origin.y) / line.direction.y; //cylinder is treated as starting at 0,0,0 and ending at 0,height,0 instead of 0,-height/2,0 and 0,height/2,0
 	if (check_cap(line, t_low, cylinder.diam))
 	{//lower cap is hit
-		if (check_cap(line, t_high, cylinder.diam))
+		if (check_cap(line, t_high, cylinder.diam)) //both hit
 			return (min_distance(t_low, t_high));
-		else
+		else //no hit on higher cap
 			return (t_low);
 	}
 	else
 	{//no hit on lower cap
 		if (check_cap(line, t_high, cylinder.diam))
 			return (t_high);
-	}
+	} //neither hit
 	return (-1);
 }
 
 double	get_cylinder_distance(t_ray line, const t_cylinder cylinder)
 {
-	line.origin = vec_sub(line.origin, cylinder.shape.ori);
+	//line.origin = vec_sub(line.origin, cylinder.shape.ori); //included in rotation???
 	//line.origin = vec_scale(line.origin, 1 / cylinder.diam);
 	//scale direction vector as well so distance is properly calculated at the end, not multiplied by cylinder size (this doesnt seem to work tho)
 	//line.direction = vec_scale(line.direction, 1 / cylinder.diam);
-	line = vec_full_rotate(line, cylinder.axis, (t_vec3) {0, 1, 0});
+	line = vec_cylinder_rotate(line, cylinder);
 	double	divisor = pow(line.direction.x, 2) + pow(line.direction.z, 2);
 	if (divisor == 0) //divide by 0, no solution //todo epsilon compare
 		return (-1);
 	double	x = 2 * line.origin.x * line.direction.x + 2 * line.origin.z * line.direction.z;
-	double	discriminant = x * x - 4 * divisor * (pow(line.origin.x, 2) + pow(line.origin.z, 2) - 1);
+	double	discriminant = x * x - 4 * divisor * (pow(line.origin.x, 2) + pow(line.origin.z, 2) - cylinder.diam);
 	if (discriminant < 0) //root square of negative number, no solution
 		return (-1);
 	double	distance;
@@ -168,7 +168,7 @@ double	get_cylinder_distance(t_ray line, const t_cylinder cylinder)
 		double	d2 = check_cylinder_height(line, ((-x - sqrt(discriminant)) / (2 * divisor)), cylinder.hgt / 2);
 		distance = min_distance(d1, d2);
 	}
-	//distance = min_distance(distance, get_cylinder_caps_distance(line, cylinder));
+	distance = min_distance(distance, get_cylinder_caps_distance(line, cylinder));
 	t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, distance));
 	//t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, distance * cylinder.diam)); //scale final hit to cylinder scale
 	if (!is_point_ahead(line, hit)) //behind the screen, not valid
