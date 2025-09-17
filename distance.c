@@ -110,7 +110,7 @@ double	get_sphere_distance(t_ray line, const t_sphere sphere)
 double	check_cylinder_height(t_ray line, double distance, double height)
 { //constrain final result to finite cylinder height
 	double	hit_height = line.origin.y + distance * line.direction.y;
-	if (fabs(hit_height) < height)
+	if (hit_height < height && hit_height > 0) //todo epsilon compare
 		return (hit_height);
 	return (-1);
 }
