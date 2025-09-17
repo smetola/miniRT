@@ -127,7 +127,7 @@ double	get_cylinder_caps_distance(const t_ray line, const t_cylinder cylinder)
 	//check lower cap
 	double	t_low = (- line.origin.y) / line.direction.y; //cylinder height is doubled? (value of 1 means it extends 1 unit in both +y and -y, or that higher cap is y=height and lower cap is y=-height)
 	//check higher cap
-	double	t_high = (cylinder.hgt / 2 - line.origin.y) / line.direction.y; //cylinder is treated as starting at 0,0,0 and ending at 0,height,0 instead of 0,-height/2,0 and 0,height/2,0
+	double	t_high = (cylinder.hgt - line.origin.y) / line.direction.y; //cylinder is treated as starting at 0,0,0 and ending at 0,height,0 instead of 0,-height/2,0 and 0,height/2,0
 	if (check_cap(line, t_low, cylinder.diam))
 	{//lower cap is hit
 		if (check_cap(line, t_high, cylinder.diam)) //both hit
@@ -159,13 +159,13 @@ double	get_cylinder_distance(t_ray line, const t_cylinder cylinder)
 		return (-1);
 	double	distance;
 	if (discriminant == 0) //todo epsilon compare
-		distance = check_cylinder_height(line, (-x / (2 * divisor)), cylinder.hgt / 2);
+		distance = check_cylinder_height(line, (-x / (2 * divisor)), cylinder.hgt);
 	else
 	{
 		//double	d1 = check_cylinder_height(line, ((-x + sqrt(discriminant)) / (2 * divisor)), cylinder.hgt);
 		//double	d2 = check_cylinder_height(line, ((-x - sqrt(discriminant)) / (2 * divisor)), cylinder.hgt);
-		double	d1 = check_cylinder_height(line, ((-x + sqrt(discriminant)) / (2 * divisor)), cylinder.hgt / 2);
-		double	d2 = check_cylinder_height(line, ((-x - sqrt(discriminant)) / (2 * divisor)), cylinder.hgt / 2);
+		double	d1 = check_cylinder_height(line, ((-x + sqrt(discriminant)) / (2 * divisor)), cylinder.hgt);
+		double	d2 = check_cylinder_height(line, ((-x - sqrt(discriminant)) / (2 * divisor)), cylinder.hgt);
 		distance = min_distance(d1, d2);
 	}
 	distance = min_distance(distance, get_cylinder_caps_distance(line, cylinder));
