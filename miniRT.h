@@ -124,9 +124,6 @@ void	free_split(char **split);
 void	free_scene(t_scene *scene);
 double	ft_atof(char *str);
 
-//t_ray	generate_ray(int x, int y, t_camera cam);
-/* t_ray	generate_ray(int x, int y, t_camera cam);
-int 	hit_sphere(t_ray ray, t_sphere *sphere); */
 t_vec3 get_hit_point(t_ray ray, double t); 
 t_vec3 get_normal_at_sphere(t_vec3 point, t_sphere *sphere); 
 t_color compute_ambient(t_amb_light *amb, t_color col);

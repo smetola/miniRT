@@ -96,32 +96,3 @@ t_ray	generate_ray(int x, int y, t_camera cam)
 	ray.direction = vec_normalize(pixel_dir);
 	return (ray);
 }
-
-
-/* t_ray generate_ray(int x, int y, t_camera cam)
-{
-	t_vec3 forward = vec_normalize(cam.orient);
-	t_vec3 up = {0, 1, 0};
-	t_vec3 right = vec_normalize((t_vec3){
-		forward.y * up.z - forward.z * up.y,
-		forward.z * up.x - forward.x * up.z,
-		forward.x * up.y - forward.y * up.x
-	});
-	up = (t_vec3){
-		right.y * forward.z - right.z * forward.y,
-		right.z * forward.x - right.x * forward.z,
-		right.x * forward.y - right.y * forward.x
-	};
-
-	double aspect = (double)WIDTH / (double)HEIGHT;
-	double fov_rad = cam.fov * M_PI / 180.0;
-	double px = (2.0 * ((x + 0.5) / WIDTH) - 1.0) * tan(fov_rad / 2.0) * aspect;
-	double py = (1.0 - 2.0 * ((y + 0.5) / HEIGHT)) * tan(fov_rad / 2.0);
-
-	t_vec3 dir = vec_add(forward, vec_add(vec_scale(right, px), vec_scale(up, py)));
-
-	t_ray ray;
-	ray.origin = cam.coord;
-	ray.direction = vec_normalize(dir);
-	return ray;
-} */

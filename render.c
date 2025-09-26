@@ -35,18 +35,18 @@ static int	find_closest_sphere(t_ray ray, t_scene *scene, int *out_index, double
 
 t_color color_add(t_color a, t_color b)
 {
-    t_color r;
+	t_color	r;
 
-    r.r = a.r + b.r;
-    r.g = a.g + b.g;
-    r.b = a.b + b.b;
-    if (r.r > 255)
-        r.r = 255;
-    if (r.g > 255)
-        r.g = 255;
-   if (r.b > 255)
-       r.b = 255;
-   return (r);
+	r.r = a.r + b.r;
+	r.g = a.g + b.g;
+	r.b = a.b + b.b;
+	if (r.r > 255)
+		r.r = 255;
+	if (r.g > 255)
+		r.g = 255;
+	if (r.b > 255)
+		r.b = 255;
+	return (r);
 }
 
 
