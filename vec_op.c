@@ -151,3 +151,21 @@ t_ray	vec_cylinder_rotate(t_ray target, t_cylinder cylinder)
 	target.direction = rotate_rodrigues(target.direction, axis, angle);
 	return (target);
 }
+
+t_ray	vec_camera_rotate(t_ray target, t_camera camera)
+{
+	//rodrigues formula
+	t_vec3	forward = {0, 0, 1};
+	t_vec3	axis = vec_normalize(vec_prod(camera.orient, forward)); //axis of rotation is perpendicular to both cylinder axis and up axis
+	double	angle = acos(vec_dot(camera.orient, forward));
+	//target.origin = rotate_rodrigues(vec_sub(target.origin, cylinder.shape.ori), axis, angle);
+	target.origin = rotate_rodrigues(vec_sub(target.origin, camera.coord), axis, angle);
+	target.direction = rotate_rodrigues(target.direction, axis, angle);
+	return (target);
+}
+
+//used for calculating reflections, how vectors bounce off surfaces
+t_vec3	reflect_vector(t_vec3 target, t_vec3 normal)
+{
+	return (vec_sub(target, vec_scale(normal, 2 * vec_dot(target, normal))));
+}

@@ -44,6 +44,19 @@ typedef struct s_ray
 	t_vec3	direction;
 }	t_ray;
 
+typedef struct s_hit
+{
+	//shape id? could be assigned at the start of the scene, to prevent an object reflecting itself
+	int		is_hit; //boolean, if false the rest dont matter
+	double	distance;
+	t_color	color;
+	//t_vec3	coord; //not necessary?
+	t_vec3	surface_normal;
+	t_vec3	camera_dir;
+	t_vec3	light_dir;
+	t_vec3	reflection_dir;
+}	t_hit;
+
 typedef struct s_matrix
 {
 	int	size;
@@ -117,6 +130,11 @@ int		parse_rt_file(char *filename, t_scene *scene);
 int		parse_color(char *str, t_color *color);
 int		parse_vector(char *str, t_vec3 *vec, int is_vec);
 
+t_color	color_add(t_color c1, t_color c2);
+t_color	color_sub(t_color c1, t_color c2);
+t_color	color_prod(t_color c1, t_color c2);
+t_color	color_scale(t_color c, double s);
+
 t_vec3	vec_normalize(t_vec3 v);
 t_vec3	vec_sub(t_vec3 a, t_vec3 b);
 t_vec3	vec_add(t_vec3 a, t_vec3 b);
@@ -130,13 +148,14 @@ int		is_empty_vec(t_vec3 v);
 
 t_ray	vec_rotate_by_plane(t_ray target, t_vec3 axis, t_vec3 reference);
 t_ray	vec_cylinder_rotate(t_ray target, t_cylinder cylinder);
+t_ray	vec_camera_rotate(t_ray target, t_camera camera);
 
 t_ray	generate_ray(const int x, const int y, const t_camera cam);
 
 double	get_ray_to_point_distance(t_ray	ray, t_vec3	point);
-double	get_sphere_distance(t_ray line, const t_sphere sphere);
-double	get_plane_distance(t_ray line, const t_plane plane);
-double	get_cylinder_distance(const t_ray line, const t_cylinder cylinder);
+t_hit	get_sphere_hit(t_ray line, const t_sphere sphere);
+double	get_plane_hit(t_ray line, const t_plane plane);
+double	get_cylinder_hit(const t_ray line, const t_cylinder cylinder);
 
 int		ft_error(char *message);
 void	free_split(char **split);

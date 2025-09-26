@@ -56,7 +56,7 @@ double	get_ray_to_point_distance(t_ray	ray, t_vec3	point)
 	return (point_distance(hit, point));
 }
 
-double	get_plane_distance(t_ray line, const t_plane plane)
+double	get_plane_hit(t_ray line, const t_plane plane)
 {
 
 	//transform line before calculating intersection
@@ -78,7 +78,7 @@ double	get_plane_distance(t_ray line, const t_plane plane)
 	return	(point_distance(hit, line.origin));
 }
 
-double	get_sphere_distance(t_ray line, const t_sphere sphere)
+t_hit	get_sphere_hit(t_ray line, const t_sphere sphere)
 {
 	line.origin = vec_sub(line.origin, sphere.shape.ori);
 	line.origin = vec_scale(line.origin, 1 / sphere.diam);
@@ -86,25 +86,26 @@ double	get_sphere_distance(t_ray line, const t_sphere sphere)
 	//line.direction = vec_scale(line.direction, 1 / sphere.diam);
 	//no rotation transform, as a one color sphere is gonna be the same from all angles
 	double	divisor = vec_dot(line.direction, line.direction);
-	if (divisor == 0) //divide by 0, no solution //todo epsilon compare
-		return (-1);
+	if (fabs(divisor) < EPSILON) //divide by 0, no solution
+		return ((t_hit){0});
 	double	x = 2 * vec_dot(line.direction, line.origin);
 	double	discriminant = x * x - 4 * divisor * (vec_dot(line.origin, line.origin) - 1);
 	if (discriminant < 0) //root square of negative number, no solution
-		return (-1);
+		return ((t_hit){0});
 	double	distance;
-	if (discriminant == 0) //todo epsilon compare
+	if (discriminant < EPSILON) //todo epsilon compare
 		distance = -x / (2 * divisor);
 	else
 	{
 		double	d1 = (-x + sqrt(discriminant)) / (2 * divisor);
 		double	d2 = (-x - sqrt(discriminant)) / (2 * divisor);
-		distance = min_distance(d1, d2); //@TODO: this comparison is wrong? distance can be negative
+		distance = min_distance(d1, d2); //this is the distance that the ray travels, if its negative it means it goes behind the camera
 	}
 	t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, distance * sphere.diam)); //scale final hit to sphere scale
 	if (!is_point_ahead(line, hit)) //behind the screen, not valid
-		return (-1);
-	return	(point_distance(hit, line.origin));
+		return ((t_hit){0});
+	//surface normal is hit divided by sphere.diam?
+	return	((t_hit){1, distance * sphere.diam, sphere.shape.color, vec_scale(hit, 1/sphere.diam), vec_sub(hit, line.origin), (t_vec3){0}, (t_vec3){0}});
 }
 
 double	check_cylinder_height(t_ray line, double distance, double height)
@@ -143,7 +144,7 @@ double	get_cylinder_caps_distance(const t_ray line, const t_cylinder cylinder)
 	return (-1);
 }
 
-double	get_cylinder_distance(t_ray line, const t_cylinder cylinder)
+double	get_cylinder_hit(t_ray line, const t_cylinder cylinder)
 {
 	//line.origin = vec_sub(line.origin, cylinder.shape.ori); //included in rotation???
 	//line.origin = vec_scale(line.origin, 1 / cylinder.diam);

@@ -71,6 +71,7 @@ t_ray	generate_ray(const int x, const int y, const t_camera cam)
 	pixel.z = 1.0;
 	ray.origin = cam.coord;
 	ray.direction = vec_normalize(vec_sub(pixel, cam.coord));
+	return (vec_camera_rotate(ray, cam));
 	return (ray);
 }
 
