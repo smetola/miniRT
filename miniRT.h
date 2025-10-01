@@ -12,6 +12,7 @@
 # include <math.h>
 # define WIDTH 512
 # define HEIGHT 512
+# define EPSILON 0.001
 # ifndef M_PI
 #  define M_PI 3.14159265358979323846
 # endif
@@ -144,18 +145,21 @@ t_hit	get_sphere_hit(t_ray line, const t_sphere sphere);
 double	get_plane_hit(t_ray line, const t_plane plane);
 double	get_cylinder_hit(const t_ray line, const t_cylinder cylinder);
 
+t_ray	vec_rotate_by_plane(t_ray target, t_vec3 axis, t_vec3 reference);
+t_ray	vec_cylinder_rotate(t_ray target, t_cylinder cylinder);
+
 int		ft_error(char *message);
 void	free_split(char **split);
 void	free_scene(t_scene *scene);
 double	ft_atof(char *str);
 
-t_vec3 get_hit_point(t_ray ray, double t); 
-t_vec3 get_normal_at_sphere(t_vec3 point, t_sphere *sphere); 
-t_color compute_ambient(t_amb_light *amb, t_color col);
-t_color compute_diffuse(t_scene *scene, t_color obj_color,
-						t_vec3 normal, t_vec3 hit_point);
-int hit_sphere(t_ray ray, t_sphere *s, double *t_out);
-t_ray generate_ray(int x, int y, t_camera cam); 
-void render_scene(t_scene *scene);
+t_vec3	get_hit_point(t_ray ray, double t); 
+t_vec3	get_normal_at_sphere(t_vec3 point, t_sphere *sphere); 
+t_color	compute_ambient(const t_amb_light amb, t_color col);
+t_color	compute_diffuse(const t_scene scene, t_color obj_color,
+					t_vec3 normal, t_vec3 hit_point);
+int		hit_sphere(t_ray ray, const t_sphere s, double *t_out);
+t_ray	generate_ray(int x, int y, t_camera cam); 
+void	render_scene(const t_scene scene);
 
 #endif

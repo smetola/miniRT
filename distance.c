@@ -53,7 +53,7 @@ double	get_ray_to_point_distance(t_ray	ray, t_vec3	point)
 	else 
 		hit.z = (point.z - ray.origin.z) / ray.direction.z; //check for inf
 
-	return (point_distance(hit, point));
+	return (dot_distance(hit, point));
 }
 
 double	get_plane_hit(t_ray line, const t_plane plane)
@@ -61,7 +61,7 @@ double	get_plane_hit(t_ray line, const t_plane plane)
 
 	//transform line before calculating intersection
 	double	height = point_to_plane_distance(line.origin, plane); //y origin coordinate of ray is equal to distance of origin to the plane
-	line = vec_rotate_by_plane(line, plane.normal, (t_vec3){0, 1, 0});
+	line = vec_rotate_by_plane(line, plane.ori, (t_vec3){0, 1, 0});
 	if (line.direction.y == 0) //paralelo al plano, nunca intersecan
 		return (-1);
 	//si el plano está debajo y miras arriba, no se ve. lo mismo si inviertes el eje y
@@ -75,12 +75,12 @@ double	get_plane_hit(t_ray line, const t_plane plane)
 	t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, x));
 	if (!is_point_ahead(line, hit)) //behind the screen, not valid
 		return (-1);
-	return	(point_distance(hit, line.origin));
+	return	(dot_distance(hit, line.origin));
 }
 
 t_hit	get_sphere_hit(t_ray line, const t_sphere sphere)
 {
-	line.origin = vec_sub(line.origin, sphere.shape.ori);
+	line.origin = vec_sub(line.origin, sphere.coord);
 	line.origin = vec_scale(line.origin, 1 / sphere.diam);
 	//scale direction vector as well so distance is properly calculated at the end, not multiplied by sphere size (this doesnt seem to work tho)
 	//line.direction = vec_scale(line.direction, 1 / sphere.diam);
@@ -105,7 +105,7 @@ t_hit	get_sphere_hit(t_ray line, const t_sphere sphere)
 	if (!is_point_ahead(line, hit)) //behind the screen, not valid
 		return ((t_hit){0});
 	//surface normal is hit divided by sphere.diam?
-	return	((t_hit){1, distance * sphere.diam, sphere.shape.color, vec_scale(hit, 1/sphere.diam), vec_sub(hit, line.origin), (t_vec3){0}, (t_vec3){0}});
+	return	((t_hit){1, distance * sphere.diam, sphere.color, vec_scale(hit, 1/sphere.diam), vec_sub(hit, line.origin), (t_vec3){0}, (t_vec3){0}});
 }
 
 double	check_cylinder_height(t_ray line, double distance, double height)
@@ -174,5 +174,5 @@ double	get_cylinder_hit(t_ray line, const t_cylinder cylinder)
 	//t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, distance * cylinder.diam)); //scale final hit to cylinder scale
 	if (!is_point_ahead(line, hit)) //behind the screen, not valid
 		return (-1);
-	return	(point_distance(hit, line.origin));
+	return	(dot_distance(hit, line.origin));
 }

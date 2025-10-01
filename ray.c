@@ -26,7 +26,7 @@ t = (-B ± sqrt(Δ)) / (2·A)
 > 0 → Hay 2 puntos → el rayo entra y sale de la esfera
  */
 
-int hit_sphere(t_ray ray, t_sphere *sphere, double *t_out)
+int hit_sphere(t_ray ray, t_sphere sphere, double *t_out)
 {
 	t_vec3	oc;
 	double	a;
@@ -35,11 +35,11 @@ int hit_sphere(t_ray ray, t_sphere *sphere, double *t_out)
 	double	discriminant;
 
 	// oc = O - C
-	oc = vec_sub(ray.origin, sphere->coord);
+	oc = vec_sub(ray.origin, sphere.coord);
 	// coeficientes de la cuadrática
 	a = vec_dot(ray.direction, ray.direction);
 	b = 2.0 * vec_dot(oc, ray.direction);
-	c = vec_dot(oc, oc) - (sphere->diam / 2) * (sphere->diam / 2);
+	c = vec_dot(oc, oc) - (sphere.diam / 2) * (sphere.diam / 2);
 	discriminant = b * b - 4 * a * c;
 	if (discriminant < 0)
 		return (0); //no choca

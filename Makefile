@@ -3,7 +3,7 @@ MLX_DIR = mlx42-codam
 
 CC = gcc
 CFLAGS = -Wall -Werror -Wextra -I$(MLX_DIR)/include -Ilib/libft -lm
-LDFLAGS = -L$(MLX_BUILD) -lmlx42 -lglfw -lXext -lX11 -lm -Llib/libft -lft
+LDFLAGS = -L$(MLX_DIR)/build -lmlx42 -lglfw -lXext -lX11 -lm -Llib/libft -lft
 
 HDRS = miniRT.h
 SRCS = main.c \
