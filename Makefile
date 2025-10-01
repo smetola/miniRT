@@ -9,7 +9,7 @@ HDRS = miniRT.h
 SRCS = main.c \
 		parsing/init_parse_rt.c parsing/init_elements.c \
 		parsing/init_objects.c parsing/parse_utils.c free.c \
-		ray.c vec_op.c distance.c color.c \
+		ray.c vec_op.c distance.c color.c light.c render.c \
 		gnl/get_next_line.c gnl/get_next_line_utils.c
 
 OBJS = $(SRCS:.c=.o)
@@ -17,7 +17,7 @@ OBJS = $(SRCS:.c=.o)
 LIBFT_DIR = lib/libft
 LIBFT = $(LIBFT_DIR)/libft.a
 
-MLX_BUILD = $(MLX_DIR)/build
+MLX_BUILD = $(MLX_DIR)/build/Makefile
 MLX_LIB = $(MLX_BUILD)/libmlx42.a
 
 all: $(LIBFT) $(MLX_LIB) $(NAME)
@@ -31,8 +31,8 @@ $(NAME): $(HDRS) $(OBJS) $(LIBFT) $(MLX_LIB)
 $(LIBFT):
 	$(MAKE) -C $(LIBFT_DIR)
 
-$(MLX_LIB): $(MLX_BUILD)/Makefile
-	cd $(MLX_BUILD) && make
+$(MLX_LIB): $(MLX_BUILD)
+	cd $(MLX_DIR)/build && make
 
 $(MLX_BUILD): $(MLX_DIR)
 	cd $(MLX_DIR) && cmake -B build

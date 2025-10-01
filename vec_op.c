@@ -48,7 +48,7 @@ double	vec_dot(t_vec3 a, t_vec3 b)
 	return (a.x * b.x + a.y * b.y + a.z * b.z);
 }
 
-double	point_distance(t_vec3 a, t_vec3 b)
+double	dot_distance(t_vec3 a, t_vec3 b)
 {
 	//taken from https://stackoverflow.com/questions/14568249/finding-the-distance-between-2-3d-points
 	// (math.h is allowed)
@@ -57,7 +57,7 @@ double	point_distance(t_vec3 a, t_vec3 b)
 
 double	point_to_plane_distance(t_vec3 point, t_plane plane)
 {
-	return	vec_dot(plane.normal, vec_sub(point, plane.shape.ori));
+	return	vec_dot(plane.ori, vec_sub(point, plane.coord));
 }
 
 double	vec_length(t_vec3 v)
@@ -144,9 +144,9 @@ t_ray	vec_cylinder_rotate(t_ray target, t_cylinder cylinder)
 {
 	//rodrigues formula
 	t_vec3	up = {0, 1, 0};
-	t_vec3	axis = vec_normalize(vec_prod(cylinder.axis, up)); //axis of rotation is perpendicular to both cylinder axis and up axis
-	double	angle = acos(vec_dot(cylinder.axis, up));
-	target.origin = rotate_rodrigues(vec_sub(target.origin, cylinder.shape.ori), axis, angle);
+	t_vec3	axis = vec_normalize(vec_prod(cylinder.ori, up)); //axis of rotation is perpendicular to both cylinder axis and up axis
+	double	angle = acos(vec_dot(cylinder.ori, up));
+	target.origin = rotate_rodrigues(vec_sub(target.origin, cylinder.coord), axis, angle);
 	//target.origin = rotate_rodrigues(target.origin, axis, angle);
 	target.direction = rotate_rodrigues(target.direction, axis, angle);
 	return (target);

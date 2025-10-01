@@ -1,6 +1,5 @@
 #ifndef MINIRT_H
 # define MINIRT_H
-# define _USE_MATH_DEFINES
 
 # include <string.h>
 # include "lib/libft/libft.h"
@@ -11,14 +10,16 @@
 # include <stdlib.h>
 # include <fcntl.h>
 # include <math.h>
-
 # define WIDTH 512
 # define HEIGHT 512
-# define EPSILON 0.001
+# ifndef M_PI
+#  define M_PI 3.14159265358979323846
+# endif
 
-//extern mlx_image_t* image;
 
-typedef struct s_color //@TODO: borrar, en su lugar parsear todo a uint32_t
+extern mlx_image_t* image;
+
+typedef struct s_color
 {
 	int	r;
 	int	g;
@@ -38,12 +39,6 @@ typedef struct s_vec3
 	double	z;
 }	t_vec3;
 
-typedef struct s_ray
-{
-	t_vec3	origin;
-	t_vec3	direction;
-}	t_ray;
-
 typedef struct s_hit
 {
 	//shape id? could be assigned at the start of the scene, to prevent an object reflecting itself
@@ -57,15 +52,9 @@ typedef struct s_hit
 	t_vec3	reflection_dir;
 }	t_hit;
 
-typedef struct s_matrix
-{
-	int	size;
-	double	**m;
-}	t_matrix;
-
 typedef struct s_camera
 {
-	t_vec3 coord;
+	t_vec3	coord;
 	t_vec3	orient;
 	int		fov; //º!!
 }	t_camera;
@@ -77,31 +66,34 @@ typedef struct s_light
 	//t_color	color;
 }	t_light;
 
-typedef struct s_shape
-{
-	t_vec3	ori;
-	t_color	color;
-}	t_shape;
-
 typedef struct s_sphere
 {
-	t_shape	shape;
+	t_vec3	coord;
 	double	diam;
+	t_color	color;
 }	t_sphere;
 
 typedef struct s_plane
 {
-	t_shape	shape;
-	t_vec3	normal;
+	t_vec3	coord;
+	t_vec3	ori;
+	t_color	color;
 }	t_plane;
 
 typedef struct s_cylinder
 {
-	t_shape	shape;
-	t_vec3	axis;
+	t_vec3	coord;
+	t_vec3	ori;
 	double	diam;
 	double	hgt;
+	t_color	color;
 }	t_cylinder;
+
+typedef struct	s_ray
+{
+	t_vec3	origin;
+	t_vec3	direction;
+}	t_ray;
 
 typedef struct s_scene
 {
@@ -142,15 +134,10 @@ t_vec3	vec_reverse(t_vec3 v);
 t_vec3	vec_scale(t_vec3 v, double s);
 t_vec3	vec_prod(t_vec3 a, t_vec3 b);
 double	vec_dot(t_vec3 a, t_vec3 b);
-double	point_distance(t_vec3 a, t_vec3 b);
+double	vec_length(t_vec3 v);
+double	dot_distance(t_vec3 a, t_vec3 b);
 double	point_to_plane_distance(t_vec3 point, t_plane plane);
 int		is_empty_vec(t_vec3 v);
-
-t_ray	vec_rotate_by_plane(t_ray target, t_vec3 axis, t_vec3 reference);
-t_ray	vec_cylinder_rotate(t_ray target, t_cylinder cylinder);
-t_ray	vec_camera_rotate(t_ray target, t_camera camera);
-
-t_ray	generate_ray(const int x, const int y, const t_camera cam);
 
 double	get_ray_to_point_distance(t_ray	ray, t_vec3	point);
 t_hit	get_sphere_hit(t_ray line, const t_sphere sphere);
@@ -161,5 +148,14 @@ int		ft_error(char *message);
 void	free_split(char **split);
 void	free_scene(t_scene *scene);
 double	ft_atof(char *str);
+
+t_vec3 get_hit_point(t_ray ray, double t); 
+t_vec3 get_normal_at_sphere(t_vec3 point, t_sphere *sphere); 
+t_color compute_ambient(t_amb_light *amb, t_color col);
+t_color compute_diffuse(t_scene *scene, t_color obj_color,
+						t_vec3 normal, t_vec3 hit_point);
+int hit_sphere(t_ray ray, t_sphere *s, double *t_out);
+t_ray generate_ray(int x, int y, t_camera cam); 
+void render_scene(t_scene *scene);
 
 #endif

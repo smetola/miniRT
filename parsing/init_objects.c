@@ -29,8 +29,8 @@ int	init_sphere(char *line, t_scene *scene)
 	if (!new_spheres)
 		return (0);
 	new_spheres[scene->num_spheres].diam = ft_atof(split[1]);
-	if (!parse_vector(split[0], &new_spheres[scene->num_spheres].shape.ori, 0)
-		|| !parse_color(split[2], &new_spheres[scene->num_spheres].shape.color))
+	if (!parse_vector(split[0], &new_spheres[scene->num_spheres].coord, 0)
+		|| !parse_color(split[2], &new_spheres[scene->num_spheres].color))
 		return (0);
 	scene->spheres = new_spheres;
 	scene->num_spheres++;
@@ -52,9 +52,9 @@ int	init_plane(char *line, t_scene *scene)
 	if (!new_planes)
 		return (0);
 	pl = &new_planes[scene->num_planes];
-	if (!parse_vector(split[0], &pl->shape.ori, 0)
-		|| !parse_vector(split[1], &pl->normal, 1)
-		|| !parse_color(split[2], &pl->shape.color))
+	if (!parse_vector(split[0], &pl->coord, 0)
+		|| !parse_vector(split[1], &pl->ori, 1)
+		|| !parse_color(split[2], &pl->color))
 		return (0);
 	scene->planes = new_planes;
 	scene->num_planes++;
@@ -76,12 +76,12 @@ int	init_cylinder(char *line, t_scene *scene)
 	if (!new_cylinders)
 		return (0);
 	cy = &new_cylinders[scene->num_cylinders];
-	if (!parse_vector(split[0], &cy->shape.ori, 0)
-		|| !parse_vector(split[1], &cy->axis, 1))
+	if (!parse_vector(split[0], &cy->coord, 0)
+		|| !parse_vector(split[1], &cy->ori, 1))
 		return (0);
 	cy->diam = ft_atof(split[2]);
 	cy->hgt = ft_atof(split[3]);
-	if (!parse_color(split[4], &cy->shape.color))
+	if (!parse_color(split[4], &cy->color))
 		return (0);
 	scene->cylinders = new_cylinders;
 	scene->num_cylinders++;

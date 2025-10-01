@@ -20,12 +20,13 @@ B = 2·dot(oc, D)
 C = dot(oc, oc) - r²
 Solución: A·t² + B·t + C = 0
 Δ = B² - 4·A·C
+t = (-B ± sqrt(Δ)) / (2·A)
 < 0 → No hay soluciones reales → no hay colisión
 = 0 → Hay 1 punto → el rayo roza la esfera
 > 0 → Hay 2 puntos → el rayo entra y sale de la esfera
  */
 
-/*int	hit_sphere(t_ray ray, t_sphere *sphere)
+int hit_sphere(t_ray ray, t_sphere *sphere, double *t_out)
 {
 	t_vec3	oc;
 	double	a;
@@ -40,38 +41,58 @@ Solución: A·t² + B·t + C = 0
 	b = 2.0 * vec_dot(oc, ray.direction);
 	c = vec_dot(oc, oc) - (sphere->diam / 2) * (sphere->diam / 2);
 	discriminant = b * b - 4 * a * c;
-	// si el discriminante es negativo, no choca
 	if (discriminant < 0)
-		return (0);
+		return (0); //no choca
+	discriminant = sqrt(discriminant);
+	/* intentamos la solución más cercana */
+	*t_out = (-b - discriminant) / (2.0 * a);
+	if (*t_out <= 0.0)
+	{
+		*t_out = (-b + discriminant) / (2.0 * a);
+		if (*t_out <= 0.0)
+			return (0);
+	}
 	return (1); // choca
-}*/
-
-
-t_ray	generate_ray(const int x, const int y, const t_camera cam)
-{
-	t_ray	ray;
-	t_vec3	pixel;
-	double	u;
-	double	v;
-	double	aspect_ratio;
-	double	fov_rad;
-	double	viewport_height;
-	double	viewport_width;
-
-	aspect_ratio = (double)WIDTH / (double)HEIGHT;
-	fov_rad = cam.fov * M_PI / 180.0; //convertimos de grados a radianes
-	viewport_height = 2.0 * tan(fov_rad / 2.0); // vertical
-	viewport_width = aspect_ratio * viewport_height;
-	// convertimos los pixeles x,y a rango [-1, 1] para q el 0,0 esté en el centro y no arriba a la izda
-	u = ((x + 0.5) / WIDTH - 0.5) * viewport_width;
-	v = (0.5 - (y + 0.5) / HEIGHT) * viewport_height;
-	// Suponemos plano z = 1, el punto a mirar está ahí
-	pixel.x = u;
-	pixel.y = v;
-	pixel.z = 1.0;
-	ray.origin = cam.coord;
-	ray.direction = vec_normalize(vec_sub(pixel, cam.coord));
-	return (vec_camera_rotate(ray, cam));
-	return (ray);
 }
 
+static t_vec3	viewport_to_world(double u, double v, t_camera cam)
+{
+	t_vec3	forward;
+	t_vec3	up;
+	t_vec3	right;
+	t_vec3	world_point;
+
+	forward = vec_normalize(cam.orient);
+	up = (t_vec3){0, 1, 0};
+	if (fabs(forward.x) < 1e-6 && fabs(forward.z) < 1e-6) //prevenir gimbal lock
+		up = (t_vec3){0, 0, 1};
+	right = vec_normalize(vec_prod(up, forward));
+	up = vec_prod(forward, right);
+	// Transformar coordenadas del viewport al espacio real
+	world_point = vec_add(forward, vec_add(vec_scale(right, u), vec_scale(up, v)));
+	return (world_point);
+}
+
+/*
+	WIDTH / HEIGHT				<- aspect ratio
+	cam.fov * M_PI / 180.0		<- convertir grados a radianes
+	viewport = ancho del plano  <- calculado desde el FOV horizontal
+*/
+t_ray	generate_ray(int x, int y, t_camera cam)
+{
+	t_ray	ray;
+	t_vec3	pixel_dir;
+	double	u;
+	double	v;
+	double	viewport;
+
+	viewport = 2.0 * tan(cam.fov * M_PI / 180.0 / 2.0);
+	// Convertir coordenadas de pixel a coordenadas del viewport
+	u = ((x + 0.5) / WIDTH - 0.5) * viewport;
+	v = (0.5 - (y + 0.5) / HEIGHT) * (viewport / (WIDTH / (double)HEIGHT));
+	// Transformar usando la orientación real de la cámara
+	pixel_dir = viewport_to_world(u, v, cam);
+	ray.origin = cam.coord;
+	ray.direction = vec_normalize(pixel_dir);
+	return (ray);
+}
