@@ -90,3 +90,33 @@ t_color compute_diffuse(const t_scene scene, t_color obj_color,
 	if (result.b > 255) result.b = 255;
 	return (result);
 }
+
+t_color compute_specular(const t_scene scene, t_color obj_color, t_vec3 normal, t_vec3 hit_point)
+{
+	t_vec3	l_dir;
+	t_vec3	c_dir;
+	double	intensity;
+	t_color	result;
+
+	// dirección del reflejo de la luz en el objeto
+	if (is_in_shadow(scene, hit_point, vec_normalize(vec_sub(scene.light.coord, hit_point))))
+	{
+		result.r = 0;
+		result.g = 0;
+		result.b = 0;
+		return (result);
+	}
+	l_dir = vec_normalize(vec_sub(hit_point, scene.light.coord)); //normalize?
+	l_dir = reflect_vector(l_dir, normal); //direccion de la luz refractada en el objeto
+	c_dir = vec_normalize(vec_sub(hit_point, scene.camera.coord)); //direccion del objeto hacia la camara
+	
+	// intensida brillo de la luz * (dot_nl^intensidad del reflejo)
+	intensity = scene.light.bright * pow(vec_dot(l_dir, c_dir), REFLECTION_INTENSITY); //intensidad depende de cuanto se acercen el vector de refraccion y el que apunta a la camara
+	result.r = (int)(obj_color.r * intensity);
+	result.g = (int)(obj_color.g * intensity);
+	result.b = (int)(obj_color.b * intensity);
+	if (result.r > 255) result.r = 255;
+	if (result.g > 255) result.g = 255;
+	if (result.b > 255) result.b = 255;
+	return (result);
+}

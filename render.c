@@ -57,21 +57,15 @@ static int32_t	shade_pixel(const t_scene scene, t_ray ray, int index, double t)
 	t_color	obj;
 	t_color	amb;
 	t_color	diff;
+	t_color	specular;
 
 	hit = get_hit_point(ray, t);
 	normal = get_normal_at_sphere(hit, &scene.spheres[index]);
 	obj = scene.spheres[index].color;
 	amb = compute_ambient(scene.ambient, obj);
 	diff = compute_diffuse(scene, obj, normal, hit);
-	amb.r += diff.r;
-	if (amb.r > 255)
-		amb.r = 255;
-	amb.g += diff.g;
-	if (amb.g > 255)
-		amb.g = 255;
-	amb.b += diff.b;
-	if (amb.b > 255)
-		amb.b = 255;
+	specular = compute_specular(scene, (t_color) {150, 150, 150}, normal, hit); //usar scene.light.color si tuviera, si no se usa color blanco
+	amb = color_add(color_add(amb, diff), specular);
 	return (ft_pixel(amb.r, amb.g, amb.b, 255));
 }
 

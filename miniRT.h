@@ -13,6 +13,7 @@
 # define WIDTH 512
 # define HEIGHT 512
 # define EPSILON 0.001
+# define REFLECTION_INTENSITY 30 //cuanto mas alto, mas baja la intensidad. en 100 el reflejo es un punto pequeño, y en 1 o menos casi todo es blanco
 # ifndef M_PI
 #  define M_PI 3.14159265358979323846
 # endif
@@ -139,6 +140,7 @@ double	vec_length(t_vec3 v);
 double	dot_distance(t_vec3 a, t_vec3 b);
 double	point_to_plane_distance(t_vec3 point, t_plane plane);
 int		is_empty_vec(t_vec3 v);
+t_vec3	reflect_vector(t_vec3 target, t_vec3 normal);
 
 double	get_ray_to_point_distance(t_ray	ray, t_vec3	point);
 t_hit	get_sphere_hit(t_ray line, const t_sphere sphere);
@@ -156,8 +158,9 @@ double	ft_atof(char *str);
 t_vec3	get_hit_point(t_ray ray, double t); 
 t_vec3	get_normal_at_sphere(t_vec3 point, t_sphere *sphere); 
 t_color	compute_ambient(const t_amb_light amb, t_color col);
-t_color	compute_diffuse(const t_scene scene, t_color obj_color,
-					t_vec3 normal, t_vec3 hit_point);
+t_color	compute_diffuse(const t_scene scene, t_color obj_color, t_vec3 normal, t_vec3 hit_point);
+t_color	compute_specular(const t_scene scene, t_color obj_color, t_vec3 normal, t_vec3 hit_point);
+
 int		hit_sphere(t_ray ray, const t_sphere s, double *t_out);
 t_ray	generate_ray(int x, int y, t_camera cam); 
 void	render_scene(const t_scene scene);
