@@ -2,55 +2,57 @@
 
 t_vec3	get_hit_point(t_ray ray, double t)
 {
-	t_vec3 hit;
+	t_vec3	hit;
 
 	hit.x = ray.origin.x + ray.direction.x * t;
 	hit.y = ray.origin.y + ray.direction.y * t;
 	hit.z = ray.origin.z + ray.direction.z * t;
-
 	return (hit);
 }
 
-t_vec3 get_normal_at_sphere(t_vec3 point, t_sphere *sphere)
+t_vec3	get_normal_at_sphere(t_vec3 point, t_sphere *sphere)
 {
-	t_vec3 normal;
+	t_vec3	normal;
 
 	normal = vec_sub(point, sphere->coord);
 	return (vec_normalize(normal));
 }
 
-t_color compute_ambient(const t_amb_light amb, t_color obj_color)
+t_color	compute_ambient(const t_amb_light *amb, t_color obj_color)
 {
 	t_color	result;
 
-	result.r = (int)(obj_color.r * amb.ratio * (amb.color.r / 255.0));
-	result.g = (int)(obj_color.g * amb.ratio * (amb.color.g / 255.0));
-	result.b = (int)(obj_color.b * amb.ratio * (amb.color.b / 255.0));
-	// Clamp a [0,255]
-	if (result.r > 255) result.r = 255;
-	if (result.g > 255) result.g = 255;
-	if (result.b > 255) result.b = 255;
+	result.r = (int)(obj_color.r * amb->ratio * (amb->color.r / 255.0));
+	result.g = (int)(obj_color.g * amb->ratio * (amb->color.g / 255.0));
+	result.b = (int)(obj_color.b * amb->ratio * (amb->color.b / 255.0));
+	if (result.r > 255)
+		result.r = 255;
+	if (result.g > 255)
+		result.g = 255;
+	if (result.b > 255)
+		result.b = 255;
 	return (result);
 }
 
-static int is_in_shadow(const t_scene scene, t_vec3 origin, t_vec3 dir)
+static int	is_in_shadow(const t_scene *scene, t_vec3 origin, t_vec3 dir)
 {
 	t_ray	r;
 	int		i;
-	double	t;
+	t_hit	temp;
 	double	light_dist;
 
-	light_dist = vec_length(vec_sub(scene.light.coord, origin));
+	light_dist = vec_length(vec_sub(scene->light.coord, origin));
 	r.origin.x = origin.x + dir.x * 0.0001;
 	r.origin.y = origin.y + dir.y * 0.0001;
 	r.origin.z = origin.z + dir.z * 0.0001;
 	r.direction = dir;
 	i = 0;
-	while (i < scene.num_spheres)
+	while (i < scene->num_spheres)
 	{
-		if (hit_sphere(r, scene.spheres[i], &t))
+		temp = get_sphere_hit(r, scene->spheres[i]);
+		if (temp.is_hit)
 		{
-			if (t > 0.0001 && t < light_dist)
+			if (temp.distance > 0 && temp.distance < light_dist)
 				return (1);
 		}
 		i++;
@@ -58,8 +60,7 @@ static int is_in_shadow(const t_scene scene, t_vec3 origin, t_vec3 dir)
 	return (0);
 }
 
-
-t_color compute_diffuse(const t_scene scene, t_color obj_color,
+t_color	compute_diffuse(const t_scene *scene, t_color obj_color,
 						t_vec3 normal, t_vec3 hit_point)
 {
 	t_vec3	l_dir;
@@ -67,9 +68,7 @@ t_color compute_diffuse(const t_scene scene, t_color obj_color,
 	double	intensity;
 	t_color	result;
 
-	// dirección normalizada a la luz
-	l_dir = vec_normalize(vec_sub(scene.light.coord, hit_point));
-	// ángulo
+	l_dir = vec_normalize(vec_sub(scene->light.coord, hit_point));
 	dot_nl = vec_dot(normal, l_dir);
 	if (dot_nl < 0)
 		dot_nl = 0;
@@ -80,43 +79,45 @@ t_color compute_diffuse(const t_scene scene, t_color obj_color,
 		result.b = 0;
 		return (result);
 	}
-	// intensida brillo de la luz * dot_nl
-	intensity = scene.light.bright * dot_nl;
+	intensity = scene->light.bright * dot_nl;
 	result.r = (int)(obj_color.r * intensity);
 	result.g = (int)(obj_color.g * intensity);
 	result.b = (int)(obj_color.b * intensity);
-	if (result.r > 255) result.r = 255;
-	if (result.g > 255) result.g = 255;
-	if (result.b > 255) result.b = 255;
+	if (result.r > 255)
+		result.r = 255;
+	if (result.g > 255)
+		result.g = 255;
+	if (result.b > 255)
+		result.b = 255;
 	return (result);
 }
 
-t_color compute_specular(const t_scene scene, t_color obj_color, t_vec3 normal, t_vec3 hit_point)
+t_color	compute_specular(const t_scene *scene, t_color obj_color, t_vec3 normal, t_vec3 hit_point)
 {
 	t_vec3	l_dir;
 	t_vec3	c_dir;
 	double	intensity;
 	t_color	result;
 
-	// dirección del reflejo de la luz en el objeto
-	if (is_in_shadow(scene, hit_point, vec_normalize(vec_sub(scene.light.coord, hit_point))))
+	if (is_in_shadow(scene, hit_point, vec_normalize(vec_sub(scene->light.coord, hit_point))))
 	{
 		result.r = 0;
 		result.g = 0;
 		result.b = 0;
 		return (result);
 	}
-	l_dir = vec_normalize(vec_sub(hit_point, scene.light.coord)); //normalize?
-	l_dir = reflect_vector(l_dir, normal); //direccion de la luz refractada en el objeto
-	c_dir = vec_normalize(vec_sub(hit_point, scene.camera.coord)); //direccion del objeto hacia la camara
-	
-	// intensida brillo de la luz * (dot_nl^intensidad del reflejo)
-	intensity = scene.light.bright * pow(vec_dot(l_dir, c_dir), REFLECTION_INTENSITY); //intensidad depende de cuanto se acercen el vector de refraccion y el que apunta a la camara
+	l_dir = vec_normalize(vec_sub(hit_point, scene->light.coord));
+	l_dir = reflect_vector(l_dir, normal);
+	c_dir = vec_normalize(vec_sub(hit_point, scene->camera.coord));
+	intensity = scene->light.bright * pow(vec_dot(l_dir, c_dir), REFLECTION_INTENSITY);
 	result.r = (int)(obj_color.r * intensity);
 	result.g = (int)(obj_color.g * intensity);
 	result.b = (int)(obj_color.b * intensity);
-	if (result.r > 255) result.r = 255;
-	if (result.g > 255) result.g = 255;
-	if (result.b > 255) result.b = 255;
+	if (result.r > 255)
+		result.r = 255;
+	if (result.g > 255)
+		result.g = 255;
+	if (result.b > 255)
+		result.b = 255;
 	return (result);
 }

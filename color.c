@@ -1,6 +1,6 @@
 #include "miniRT.h"
 
-/*t_color	color_add(t_color c1, t_color c2)
+t_color	color_add(t_color c1, t_color c2)
 {
 	c1.b += c2.b;
 	c1.r += c2.r;
@@ -12,7 +12,7 @@
 	if (c1.g > 255)
 		c1.g = 255;
 	return (c1);
-}*/
+}
 
 t_color	color_sub(t_color c1, t_color c2)
 {

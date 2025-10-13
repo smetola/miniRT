@@ -56,6 +56,43 @@ double	get_ray_to_point_distance(t_ray	ray, t_vec3	point)
 	return (dot_distance(hit, point));
 }
 
+t_hit	get_sphere_hit(t_ray line, const t_sphere sphere)
+{
+	double	divisor;
+	double	x;
+	double	discriminant;
+	double	distance;
+	double	world_distance;
+	double	d1;
+	double	d2;
+	t_vec3	hit_local;
+	t_vec3	normal;
+
+	line.origin = vec_sub(line.origin, sphere.coord);
+	line.origin = vec_scale(line.origin, 2.0 / sphere.diam);
+	divisor = vec_dot(line.direction, line.direction);
+	if (fabs(divisor) < EPSILON) // divide by 0, no solution
+		return ((t_hit){0});
+	x = 2 * vec_dot(line.direction, line.origin);
+	discriminant = x * x - 4 * divisor * (vec_dot(line.origin, line.origin) - 1);
+	if (discriminant < 0)
+		return ((t_hit){0});
+	if (discriminant < EPSILON)
+		distance = -x / (2 * divisor);
+	else
+	{
+		d1 = (-x + sqrt(discriminant)) / (2 * divisor);
+		d2 = (-x - sqrt(discriminant)) / (2 * divisor);
+		distance = min_distance(d1, d2);
+	}
+	if (distance <= 0)
+		return ((t_hit){0});
+	hit_local = vec_add(line.origin, vec_scale(line.direction, distance));
+	normal = vec_normalize(hit_local);
+	world_distance = distance * sphere.diam / 2.0;
+	return ((t_hit){1, world_distance, sphere.color, normal, (t_vec3){0}, (t_vec3){0}, (t_vec3){0}});
+}
+
 double	get_plane_hit(t_ray line, const t_plane plane)
 {
 
@@ -76,36 +113,6 @@ double	get_plane_hit(t_ray line, const t_plane plane)
 	if (!is_point_ahead(line, hit)) //behind the screen, not valid
 		return (-1);
 	return	(dot_distance(hit, line.origin));
-}
-
-t_hit	get_sphere_hit(t_ray line, const t_sphere sphere)
-{
-	line.origin = vec_sub(line.origin, sphere.coord);
-	line.origin = vec_scale(line.origin, 1 / sphere.diam);
-	//scale direction vector as well so distance is properly calculated at the end, not multiplied by sphere size (this doesnt seem to work tho)
-	//line.direction = vec_scale(line.direction, 1 / sphere.diam);
-	//no rotation transform, as a one color sphere is gonna be the same from all angles
-	double	divisor = vec_dot(line.direction, line.direction);
-	if (fabs(divisor) < EPSILON) //divide by 0, no solution
-		return ((t_hit){0});
-	double	x = 2 * vec_dot(line.direction, line.origin);
-	double	discriminant = x * x - 4 * divisor * (vec_dot(line.origin, line.origin) - 1);
-	if (discriminant < 0) //root square of negative number, no solution
-		return ((t_hit){0});
-	double	distance;
-	if (discriminant < EPSILON) //todo epsilon compare
-		distance = -x / (2 * divisor);
-	else
-	{
-		double	d1 = (-x + sqrt(discriminant)) / (2 * divisor);
-		double	d2 = (-x - sqrt(discriminant)) / (2 * divisor);
-		distance = min_distance(d1, d2); //this is the distance that the ray travels, if its negative it means it goes behind the camera
-	}
-	t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, distance * sphere.diam)); //scale final hit to sphere scale
-	if (!is_point_ahead(line, hit)) //behind the screen, not valid
-		return ((t_hit){0});
-	//surface normal is hit divided by sphere.diam?
-	return	((t_hit){1, distance * sphere.diam, sphere.color, vec_scale(hit, 1/sphere.diam), vec_sub(hit, line.origin), (t_vec3){0}, (t_vec3){0}});
 }
 
 double	check_cylinder_height(t_ray line, double distance, double height)
