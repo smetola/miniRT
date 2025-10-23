@@ -58,6 +58,8 @@ typedef struct s_camera
 	t_vec3	coord;
 	t_vec3	orient;
 	int		fov; // degrees
+	double	rotation_angle;
+	t_vec3	rotation_axis;
 }	t_camera;
 
 typedef struct s_light
@@ -87,6 +89,8 @@ typedef struct s_cylinder
 	double	diam;
 	double	hgt;
 	t_color	color;
+	double	rotation_angle;
+	t_vec3	rotation_axis;
 }	t_cylinder;
 
 typedef struct	s_ray
@@ -148,11 +152,11 @@ t_vec3	reflect_vector(t_vec3 target, t_vec3 normal);
 t_vec3	rotate_rodrigues(t_vec3 target, t_vec3 axis, double angle);
 
 t_hit	get_sphere_hit(t_ray line, const t_sphere sphere);
-double	get_plane_hit(t_ray line, const t_plane plane);
-double	get_cylinder_hit(const t_ray line, const t_cylinder cylinder);
+t_hit	get_plane_hit(t_ray line, const t_plane plane);
+t_hit	get_cylinder_hit(const t_ray line, const t_cylinder cylinder);
 
 t_ray	vec_rotate_by_plane(t_ray target, t_vec3 axis, t_vec3 reference);
-t_ray	vec_cylinder_rotate(t_ray target, t_cylinder cylinder);
+t_ray	vec_cylinder_rotate(t_ray target, t_cylinder cylinder, int reverse);
 t_ray	vec_camera_rotate(t_ray target, t_camera camera);
 
 /* Santi's shading helpers (updated to take pointers to scene) */

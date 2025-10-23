@@ -14,7 +14,7 @@ t_color	color_add(t_color c1, t_color c2)
 	return (c1);
 }
 
-t_color	color_sub(t_color c1, t_color c2)
+t_color	color_sub(t_color c1, t_color c2) //borrar?
 {
 	c1.b -= c2.b;
 	c1.r -= c2.r;
@@ -28,7 +28,7 @@ t_color	color_sub(t_color c1, t_color c2)
 	return (c1);
 }
 
-t_color	color_prod(t_color c1, t_color c2)
+t_color	color_prod(t_color c1, t_color c2) //borrar?
 {
 	c1.b *= c2.b;
 	c1.r *= c2.r;
@@ -42,7 +42,7 @@ t_color	color_prod(t_color c1, t_color c2)
 	return (c1);
 }
 
-t_color	color_scale(t_color c, double s)
+t_color	color_scale(t_color c, double s) //borrar?
 {
 	c.b *= s;
 	c.r *= s;

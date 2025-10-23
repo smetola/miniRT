@@ -1,3 +1,4 @@
 *.o
+*.a
 mlx42-codam
 miniRT

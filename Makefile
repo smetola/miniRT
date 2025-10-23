@@ -18,7 +18,7 @@ LIBFT_DIR = lib/libft
 LIBFT = $(LIBFT_DIR)/libft.a
 
 MLX_BUILD = $(MLX_DIR)/build/Makefile
-MLX_LIB = $(MLX_BUILD)/libmlx42.a
+MLX_LIB = $(MLX_DIR)/build/libmlx42.a
 
 all: $(LIBFT) $(MLX_LIB) $(NAME)
 

@@ -18,9 +18,9 @@ t_hit	get_ray_hit(const int x, const int y, const t_scene *scene)
 
 	result.is_hit = 0;
 	min_dist = DBL_MAX;
-	r = generate_ray(x, y, scene->camera);
-	i = 0;
+	r = generate_ray(x, y, scene->camera); //ray is already generated in parent function, pass as parameter?
 	/* spheres */
+	i = 0;
 	while (i < scene->num_spheres)
 	{
 		temp = get_sphere_hit(r, scene->spheres[i]);
@@ -35,35 +35,45 @@ t_hit	get_ray_hit(const int x, const int y, const t_scene *scene)
 		}
 		i++;
 	}
-	/*i = 0;
-	while (i < scene.num_planes)
+	/*planes*/
+	i = 0;
+	while (i < scene->num_planes)
 	{
-		dist = get_plane_hit(generate_ray(x, y, scene.camera), scene.planes[i]);
-		if (dist < min && dist > 0) //&& dist = 0?
+		temp = get_plane_hit(r, scene->planes[i]);
+		if (temp.is_hit)
 		{
-			min = dist;
-			hit = &(scene.planes + i)->shape;
+			if (temp.distance > 0 && temp.distance < min_dist) //&& dist = 0?
+			{
+				min_dist = temp.distance;
+				result = temp;
+				result.is_hit = 1;
+			}
 		}
 		i++;
 	}
+	/*cylinders*/
 	i = 0;
-	while (i < scene.num_cylinders)
+	while (i < scene->num_cylinders)
 	{
-		dist = get_cylinder_hit(generate_ray(x, y, scene.camera), scene.cylinders[i]);
-		if (dist < min && dist > 0)
+		temp = get_cylinder_hit(r, scene->cylinders[i]);
+		if (temp.is_hit)
 		{
-			min = dist;
-			hit = &(scene.cylinders + i)->shape;
+			if (temp.distance > 0 && temp.distance < min_dist) //&& dist = 0?
+			{
+				min_dist = temp.distance;
+				result = temp;
+				result.is_hit = 1;
+			}
 		}
 		i++;
-	}*/
+	}
 	/* fill camera_dir, light_dir, reflection_dir if hit */
 	if (result.is_hit)
 	{
 		hitp = get_hit_point(r, result.distance);
 		result.camera_dir = vec_normalize(vec_sub(scene->camera.coord, hitp));
 		result.light_dir = vec_normalize(vec_sub(scene->light.coord, hitp));
-		result.reflection_dir = reflect_vector(vec_scale(result.light_dir, -1), result.surface_normal);
+		result.reflection_dir = reflect_vector(vec_reverse(result.light_dir), result.surface_normal);
 	}
 	return (result);
 }
@@ -72,13 +82,14 @@ static int32_t	shade_hit(const t_scene *scene, t_hit hit, t_ray ray)
 {
 	t_color	amb;
 	t_color	diff;
-	t_color	spec;
+	//t_color	spec;
 	t_color	accum;
 
 	amb = compute_ambient(&scene->ambient, hit.color);
 	diff = compute_diffuse(scene, hit.color, hit.surface_normal, get_hit_point(ray, hit.distance));
-	spec = compute_specular(scene, hit.color, hit.surface_normal, get_hit_point(ray, hit.distance));
-	accum = color_add(color_add(amb, diff), spec);
+	//spec = compute_specular(scene, hit.color, hit.surface_normal, get_hit_point(ray, hit.distance));
+	//accum = color_add(color_add(amb, diff), spec);
+	accum = color_add(amb, diff);
 	return (ft_pixel(accum.r, accum.g, accum.b, 255));
 }
 

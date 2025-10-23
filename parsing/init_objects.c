@@ -86,5 +86,9 @@ int	init_cylinder(char *line, t_scene *scene)
 	scene->cylinders = new_cylinders;
 	scene->num_cylinders++;
 	free_split(split);
+	/*calculate rotation axis and angle in advance*/
+	t_vec3	up = {0, 1, 0};
+	cy->rotation_axis = vec_normalize(vec_prod(cy->ori, up)); //axis of rotation is perpendicular to both cylinder axis and up axis
+	cy->rotation_angle = acos(vec_dot(cy->ori, up));
 	return (1);
 }

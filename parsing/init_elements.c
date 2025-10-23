@@ -36,6 +36,10 @@ int	init_camera(char *line, t_scene *scene)
 	}
 	scene->camera.fov = ft_atoi(split[2]);
 	free_split(split);
+	/*calculate rotation axis and angle in advance*/
+	t_vec3	forward = {0, 0, 1};
+	scene->camera.rotation_axis = vec_normalize(vec_prod(scene->camera.orient, forward)); //axis of rotation is perpendicular to both camera orientation and forward axis
+	scene->camera.rotation_angle = acos(vec_dot(scene->camera.orient, forward));
 	return (1);
 }
 
