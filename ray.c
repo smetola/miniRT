@@ -15,7 +15,7 @@ t_ray	generate_ray(int x, int y, t_camera cam)
 	ray.origin = cam.coord;
 	dir.x = u;
 	dir.y = v;
-	dir.z = 1.0;
+	dir.z = FOCAL_LENGTH;
 	ray.direction = dir;
 	ray = vec_camera_rotate(ray, cam);
 	ray.direction = vec_normalize(ray.direction);

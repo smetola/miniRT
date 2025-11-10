@@ -14,6 +14,7 @@
 # define WIDTH 512
 # define HEIGHT 512
 # define EPSILON 0.001
+# define FOCAL_LENGTH 1
 # define REFLECTION_INTENSITY 30 //cuanto mas alto, mas baja la intensidad. en 100 el reflejo es un punto pequeño, y en 1 o menos casi todo es blanco
 
 # ifndef M_PI
@@ -89,8 +90,6 @@ typedef struct s_cylinder
 	double	diam;
 	double	hgt;
 	t_color	color;
-	double	rotation_angle;
-	t_vec3	rotation_axis;
 }	t_cylinder;
 
 typedef struct	s_ray
@@ -155,7 +154,7 @@ t_hit	get_sphere_hit(t_ray line, const t_sphere sphere);
 t_hit	get_plane_hit(t_ray line, const t_plane plane);
 t_hit	get_cylinder_hit(const t_ray line, const t_cylinder cylinder);
 
-t_ray	vec_rotate_by_plane(t_ray target, t_vec3 axis, t_vec3 reference);
+t_ray	vec_rotate_by_plane(t_ray target, t_plane plane);
 t_ray	vec_cylinder_rotate(t_ray target, t_cylinder cylinder, int reverse);
 t_ray	vec_camera_rotate(t_ray target, t_camera camera);
 
@@ -171,5 +170,7 @@ int		hit_sphere(t_ray ray, const t_sphere s, double *t_out);
 t_ray	generate_ray(int x, int y, t_camera cam);
 t_hit	get_ray_hit(const int x, const int y, const t_scene *scene);
 void	render_scene(const t_scene *scene);
+
+t_vec3	ray_distance(t_vec3 start, t_vec3 direction, double distance);
 
 #endif

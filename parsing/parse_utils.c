@@ -37,7 +37,7 @@ int	parse_vector(char *str, t_vec3 *vec, int is_vec)
 	free_split(split);
 	if (is_vec
 		&& (x < -1.0 || x > 1.0 || y < -1.0 || y > 1.0 || z < -1.0 || z > 1.0))
-		return (ft_error("Vector component out of range [-1,1]"));
+		return (ft_error("Vector component out of range [-1,1]")); //todo error case for null direction vector?
 	vec->x = x;
 	vec->y = y;
 	vec->z = z;

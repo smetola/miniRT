@@ -57,6 +57,28 @@ static int	is_in_shadow(const t_scene *scene, t_vec3 origin, t_vec3 dir)
 		}
 		i++;
 	}
+	i = 0;
+	while (i < scene->num_planes)
+	{
+		temp = get_plane_hit(r, scene->planes[i]);
+		if (temp.is_hit)
+		{
+			if (temp.distance > 0 && temp.distance < light_dist)
+				return (1);
+		}
+		i++;
+	}
+	i = 0;
+	while (i < scene->num_cylinders)
+	{
+		temp = get_cylinder_hit(r, scene->cylinders[i]);
+		if (temp.is_hit)
+		{
+			if (temp.distance > 0 && temp.distance < light_dist)
+				return (1);
+		}
+		i++;
+	}
 	return (0);
 }
 
@@ -113,7 +135,7 @@ t_color	compute_specular(const t_scene *scene, t_color obj_color, t_vec3 normal,
 	result.r = (int)(obj_color.r * intensity);
 	result.g = (int)(obj_color.g * intensity);
 	result.b = (int)(obj_color.b * intensity);
-	if (result.r > 255)
+	if (result.r > 255) //todo limit to 0 too
 		result.r = 255;
 	if (result.g > 255)
 		result.g = 255;

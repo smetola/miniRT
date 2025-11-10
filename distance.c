@@ -58,158 +58,128 @@ double	get_ray_to_point_distance(t_ray	ray, t_vec3	point)
 
 t_hit	get_sphere_hit(t_ray line, const t_sphere sphere)
 {
-	double	divisor;
-	double	x;
+	t_vec3	oc;
+	double	a;
+	double	b;
+	double	c;
 	double	discriminant;
-	double	distance;
-	double	world_distance;
-	double	d1;
-	double	d2;
-	t_vec3	hit_local;
-	t_vec3	normal;
+	double	t_out;
 
-	line.origin = vec_sub(line.origin, sphere.coord);
-	line.origin = vec_scale(line.origin, 2.0 / sphere.diam);
-	divisor = vec_dot(line.direction, line.direction);
-	if (fabs(divisor) < EPSILON) // divide by 0, no solution
-		return ((t_hit){0});
-	x = 2 * vec_dot(line.direction, line.origin);
-	discriminant = x * x - 4 * divisor * (vec_dot(line.origin, line.origin) - 1);
+	// oc = O - C
+	oc = vec_sub(line.origin, sphere.coord);
+	// coeficientes de la cuadrática
+	a = vec_dot(line.direction, line.direction);
+	b = 2.0 * vec_dot(oc, line.direction);
+	c = vec_dot(oc, oc) - (sphere.diam / 2) * (sphere.diam / 2); //todo precalculate radius in init_objects
+	discriminant = b * b - 4 * a * c;
 	if (discriminant < 0)
-		return ((t_hit){0});
-	if (discriminant < EPSILON)
-		distance = -x / (2 * divisor);
-	else
+		return ((t_hit){0}); //no choca
+	discriminant = sqrt(discriminant);
+	/* intentamos la solución más cercana */
+	t_out = (-b - discriminant) / (2.0 * a);
+	if (t_out <= 0.0)
 	{
-		d1 = (-x + sqrt(discriminant)) / (2 * divisor);
-		d2 = (-x - sqrt(discriminant)) / (2 * divisor);
-		distance = min_distance(d1, d2);
+		t_out = (-b + discriminant) / (2.0 * a);
+		if (t_out <= 0.0)
+			return ((t_hit){0});
 	}
-	if (distance <= 0)
-		return ((t_hit){0});
-	hit_local = vec_add(line.origin, vec_scale(line.direction, distance));
-	normal = vec_normalize(hit_local); //todo if camera inside, reverse normal
-	world_distance = distance * sphere.diam / 2.0;
-	return ((t_hit){1, world_distance, sphere.color, normal, (t_vec3){0}, (t_vec3){0}, (t_vec3){0}});
+	//todo instead of normalizing returned normal vector, simply divide by sphere radius. result is the same, much faster
+	return ((t_hit){1, t_out, sphere.color, vec_normalize(vec_sub(vec_add(line.origin, vec_scale(line.direction, t_out)), sphere.coord)), (t_vec3){0}, (t_vec3){0}, (t_vec3){0}}); // choca
 }
 
 t_hit	get_plane_hit(t_ray line, const t_plane plane)
 {
+	//taken from https://stackoverflow.com/questions/7168484/3d-line-segment-and-plane-intersection
+	/*float	d;
 
-	t_vec3	normal;
-	//transform line before calculating intersection
-	double	height = point_to_plane_distance(line.origin, plane); //y origin coordinate of ray is equal to distance of origin to the plane
-	line = vec_rotate_by_plane(line, plane.ori, (t_vec3){0, 1, 0});
-	if (line.direction.y == 0) //paralelo al plano, nunca intersecan
+	if (vec_dot(plane.ori, line.direction) == 0) //paralelo al plano, nunca intersecan. esto incluye el caso de que el vector es parte del plano todo epsilon compare
 		return ((t_hit){0});
-	//si el plano está debajo y miras arriba, no se ve. lo mismo si inviertes el eje y
-	//if ((height < 0 && line.direction.y < 0) || (height > 0 && line.direction.y > 0))
-	if (height > 0 && line.direction.y > 0)
-		return ((t_hit){0});
-	if (height < 0 && line.direction.y < 0)
-		return ((t_hit){0});
-	//line.origin.y -= height;
-	double x = -height/line.direction.y;
+	d = vec_dot(plane.ori, plane.coord); //todos los puntos X del plano cumplen la ecuacion vec_dot(plane.normal, X) = d
+	float x = (d - vec_dot(plane.ori, line.origin)) / vec_dot(plane.ori, line.direction);
 	t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, x));
 	if (!is_point_ahead(line, hit)) //behind the screen, not valid
 		return ((t_hit){0});
-	if (line.origin.y > 0) //epsilon compare?
-		normal = plane.ori;
+	t_vec3	normal = plane.ori;
+	if (point_to_plane_distance(line.origin, plane) < 0)
+		normal = vec_reverse(normal);
+	return	((t_hit){1, x, plane.color, normal, (t_vec3){0}, (t_vec3){0}, (t_vec3){0}});*/
+	if (vec_dot(plane.ori, line.direction) == 0)
+		return ((t_hit){0});
+	//todo if the signs of the 2 division terms are not different (- and +, or + and -), resulting t will be negative, meaning there would be no reason to divide, return empty hit
+	double	d = vec_dot(vec_sub(plane.coord, line.origin), plane.ori) / vec_dot(line.direction, plane.ori);
+	t_vec3	normal = plane.ori;
+	if (vec_dot(line.direction, plane.ori) > 0)
+		normal = vec_reverse(normal);
+	return	((t_hit){1, d, plane.color, normal, (t_vec3){0}, (t_vec3){0}, (t_vec3){0}});
+}
+
+t_hit	get_infinite_cylinder_hit(t_ray line, const t_cylinder cylinder)
+{
+	double	a;
+	double	b;
+	double	c;
+	double	delta;
+	double	t1;
+	double	t2;
+	double	h1;
+	double	h2;
+	t_vec3		u;
+	t_vec3		v;
+	t_hit		hit;
+
+	v = vec_sub(line.origin, cylinder.coord); //X = O-C
+	a = vec_dot(line.direction, line.direction) - pow(vec_dot(line.direction, cylinder.ori), 2);
+	b = vec_dot(line.direction, v) - vec_dot(line.direction, cylinder.ori) * vec_dot(v, cylinder.ori); //technically this is b/2, its simpler for quadratic equation
+	b *= 2;
+	c = vec_dot(v, v) - pow(vec_dot(v, cylinder.ori), 2) - (cylinder.diam * cylinder.diam * 0.25); //last number is equal to r^2, todo precomputation
+
+	hit.is_hit = 0;
+	hit.color = cylinder.color;
+	delta = b * b - 4 * a * c;
+	if (delta < 0)
+		return ((t_hit){0});
+	t1 = (-b - sqrt(delta)) / (a * 2);
+	t2 = (-b + sqrt(delta)) / (a * 2);
+	if (t1 <= EPSILON && t2 <= EPSILON)
+		return ((t_hit){0});
+	if (t1 <= EPSILON)
+		h1 = -1;
 	else
-		normal = vec_reverse(plane.ori);
-	return	((t_hit){1, dot_distance(hit, line.origin), plane.color, normal, (t_vec3){0}, (t_vec3){0}, (t_vec3){0}});
-}
-
-double	check_cylinder_height(t_ray line, double distance, double height)
-{ //constrain final result to finite cylinder height
-	double	hit_height = line.origin.y + distance * line.direction.y;
-	if (hit_height < height && hit_height > 0) //todo epsilon compare
-		return (hit_height);
-	return (-1);
-}
-
-double	check_cap(t_ray line, double t, double radius)
-{
-	double	x = line.origin.x + t * line.direction.x;
-	double	z = line.origin.z + t * line.direction.z;
-	return (pow(x, 2) + pow(z, 2) <= radius); //if the line distance traveled in plane xz is higher than radius within cylinder height, its not a hit
-}
-
-double	get_cylinder_caps_distance(const t_ray line, const t_cylinder cylinder, t_vec3 *normal)
-{
-	//check lower cap
-	double	t_low = (-line.origin.y) / line.direction.y; //cylinder starts at 0
-	//check higher cap
-	double	t_high = (cylinder.hgt - line.origin.y) / line.direction.y; //cylinder is treated as starting at 0,0,0 and ending at 0,height,0 instead of 0,-height/2,0 and 0,height/2,0
-	if (check_cap(line, t_low, cylinder.diam))
-	{//lower cap is hit
-		if (check_cap(line, t_high, cylinder.diam)) //both hit
-		{
-			if (min_distance(t_low, t_high) == t_low)
-				*normal = vec_reverse(cylinder.ori);
-			else
-				*normal = cylinder.ori;
-			return (min_distance(t_low, t_high));
-		}
-		else //no hit on higher cap
-		{
-			*normal = vec_reverse(cylinder.ori);
-			return (t_low);
-		}
+		h1 = vec_dot(line.direction, cylinder.ori)*t1 + vec_dot(v, cylinder.ori);
+	if (t2 <= EPSILON)
+		h2 = -1;
+	else
+		h2 = vec_dot(line.direction, cylinder.ori)*t2 + vec_dot(v, cylinder.ori);
+	if ((h2 < 0 || h2 > cylinder.hgt) && (h1 < 0 || h1 > cylinder.hgt))
+		return ((t_hit){0});
+	hit.is_hit = 1;
+	if ((h1 < 0 || h1 > cylinder.hgt) || (h2 >= 0 && h2 <= cylinder.hgt && (t2 < t1)))
+	{
+		t1 = t2;
+		h1 = h2;
 	}
-	else
-	{//no hit on lower cap
-		if (check_cap(line, t_high, cylinder.diam))
-		{
-			*normal = cylinder.ori;
-			return (t_high);
-		}
-	} //neither hit
-	return (-1);
+	hit.distance = t1;
+	u = ray_distance(line.origin, line.direction, t1);
+	hit.surface_normal = vec_normalize(vec_sub(u, vec_sub(cylinder.coord, vec_scale(cylinder.ori, h1)))); //todo normalize by diving with cylinder radius instead? less expensive operation
+	//if (??)
+	//	hit.surface_normal = vec_reverse(hit.surface_normal); //reverse normal if inside the cylinder
+	return (hit);
 }
 
 t_hit	get_cylinder_hit(t_ray line, const t_cylinder cylinder)
 {
-	//line.origin = vec_sub(line.origin, cylinder.shape.ori); //included in rotation???
-	//line.origin = vec_scale(line.origin, 1 / cylinder.diam);
-	//scale direction vector as well so distance is properly calculated at the end, not multiplied by cylinder size (this doesnt seem to work tho)
-	//line.direction = vec_scale(line.direction, 1 / cylinder.diam);
-	line = vec_cylinder_rotate(line, cylinder, 0);
-	double	divisor = pow(line.direction.x, 2) + pow(line.direction.z, 2);
-	if (divisor == 0) //divide by 0, no solution //todo epsilon compare
-		return ((t_hit){0});
-	double	x = 2 * line.origin.x * line.direction.x + 2 * line.origin.z * line.direction.z;
-	double	discriminant = x * x - 4 * divisor * (pow(line.origin.x, 2) + pow(line.origin.z, 2) - cylinder.diam);
-	if (discriminant < 0) //root square of negative number, no solution
-		return ((t_hit){0});
-	double	temp_dist;
-	double	distance;
-	if (discriminant == 0) //todo epsilon compare
-		temp_dist = check_cylinder_height(line, (-x / (2 * divisor)), cylinder.hgt);
-	else
-	{
-		double	d1 = check_cylinder_height(line, ((-x + sqrt(discriminant)) / (2 * divisor)), cylinder.hgt);
-		double	d2 = check_cylinder_height(line, ((-x - sqrt(discriminant)) / (2 * divisor)), cylinder.hgt);
-		temp_dist = min_distance(d1, d2);
-	}
-	t_vec3	normal;
-	//distance = min_distance(temp_dist, get_cylinder_caps_distance(line, cylinder, &normal));
-	//distance = get_cylinder_caps_distance(line, cylinder, &normal);(void)temp_dist; //for checking bases
-	distance = temp_dist; //for checking body
-	if (distance == -1) //miss?
-		return ((t_hit){0});
-	t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, distance));
-	//t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, distance * cylinder.diam)); //scale final hit to cylinder scale
-	if (!is_point_ahead(line, hit)) //behind the screen, not valid
-		return ((t_hit){0});
-	//if (temp_dist != distance)
-	//{//get normal from body hit
-		normal = (t_vec3){hit.x, 0, hit.z}; //local normal vector is gonna be in the direction of the local hit, with 0 change at y (height) axis
-		//reverse transform the normal back to global space (do the same rodrigues formula rotation at the start but with negated angle? idk)
-		normal = vec_cylinder_rotate((t_ray){(t_vec3){0}, normal}, cylinder, 1).direction; //leave origin empty, doesnt matter
-	//}
-	//else //cap hit, already updated normal in get_cylinder_caps_distance call
-	//todo if camera inside, reverse normal
-	//normal = cylinder.ori;
-	return	((t_hit){1, distance, cylinder.color, normal, (t_vec3){0}, (t_vec3){0}, (t_vec3){0}});
+	t_hit	result;
+	t_hit	temp_hit;
+	result.is_hit = 0;
+	result.distance = INFINITY;
+	temp_hit = get_infinite_cylinder_hit(line, cylinder);
+	if (temp_hit.is_hit && temp_hit.distance < result.distance)
+		result = temp_hit;
+	temp_hit = get_plane_hit(line, (t_plane){cylinder.coord, vec_reverse(cylinder.ori), cylinder.color});
+	if (temp_hit.is_hit && temp_hit.distance < result.distance && dot_distance(cylinder.coord, ray_distance(line.origin, line.direction, temp_hit.distance)) < cylinder.diam * 0.5)
+		result = temp_hit;
+	temp_hit = get_plane_hit(line, (t_plane){ray_distance(cylinder.coord, cylinder.ori, cylinder.hgt), cylinder.ori, cylinder.color});
+	if (temp_hit.is_hit && temp_hit.distance < result.distance && dot_distance(ray_distance(cylinder.coord, cylinder.ori, cylinder.hgt), ray_distance(line.origin, line.direction, temp_hit.distance)) < cylinder.diam * 0.5)
+		result = temp_hit;
+	return result;
 }

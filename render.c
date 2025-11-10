@@ -17,8 +17,8 @@ t_hit	get_ray_hit(const int x, const int y, const t_scene *scene)
 	t_vec3	hitp;
 
 	result.is_hit = 0;
-	min_dist = DBL_MAX;
-	r = generate_ray(x, y, scene->camera); //ray is already generated in parent function, pass as parameter?
+	min_dist = INFINITY;
+	r = generate_ray(x, y, scene->camera); //todo ray is already generated in parent function, pass as parameter?
 	/* spheres */
 	i = 0;
 	while (i < scene->num_spheres)

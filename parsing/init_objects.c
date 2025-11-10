@@ -25,7 +25,7 @@ int	init_sphere(char *line, t_scene *scene)
 	if (!split || !split[0] || !split[1] || !split[2])
 		return (0);
 	new_spheres = realloc_array(scene->spheres, scene->num_spheres,
-			scene->num_spheres + 1, sizeof(t_sphere));
+			scene->num_spheres + 1, sizeof(t_sphere)); //todo check if line is valid before realloc
 	if (!new_spheres)
 		return (0);
 	new_spheres[scene->num_spheres].diam = ft_atof(split[1]);
@@ -48,7 +48,7 @@ int	init_plane(char *line, t_scene *scene)
 	if (!split || !split[0] || !split[1] || !split[2])
 		return (ft_error("Invalid plane format"));
 	new_planes = realloc_array(scene->planes, scene->num_planes,
-			scene->num_planes + 1, sizeof(t_plane));
+			scene->num_planes + 1, sizeof(t_plane)); //todo check if line is valid before realloc
 	if (!new_planes)
 		return (0);
 	pl = &new_planes[scene->num_planes];
@@ -56,6 +56,7 @@ int	init_plane(char *line, t_scene *scene)
 		|| !parse_vector(split[1], &pl->ori, 1)
 		|| !parse_color(split[2], &pl->color))
 		return (0);
+	pl->ori = vec_normalize(pl->ori);
 	scene->planes = new_planes;
 	scene->num_planes++;
 	free_split(split);
@@ -72,7 +73,7 @@ int	init_cylinder(char *line, t_scene *scene)
 	if (!split || !split[0] || !split[1] || !split[2] || !split[3] || !split[4])
 		return (ft_error("Invalid cylinder format"));
 	new_cylinders = realloc_array(scene->cylinders, scene->num_cylinders,
-			scene->num_cylinders + 1, sizeof(t_cylinder));
+			scene->num_cylinders + 1, sizeof(t_cylinder)); //todo check if line is valid before realloc
 	if (!new_cylinders)
 		return (0);
 	cy = &new_cylinders[scene->num_cylinders];
@@ -81,14 +82,11 @@ int	init_cylinder(char *line, t_scene *scene)
 		return (0);
 	cy->diam = ft_atof(split[2]);
 	cy->hgt = ft_atof(split[3]);
+	cy->ori = vec_normalize(cy->ori);
 	if (!parse_color(split[4], &cy->color))
 		return (0);
 	scene->cylinders = new_cylinders;
 	scene->num_cylinders++;
 	free_split(split);
-	/*calculate rotation axis and angle in advance*/
-	t_vec3	up = {0, 1, 0};
-	cy->rotation_axis = vec_normalize(vec_prod(cy->ori, up)); //axis of rotation is perpendicular to both cylinder axis and up axis
-	cy->rotation_angle = acos(vec_dot(cy->ori, up));
 	return (1);
 }
