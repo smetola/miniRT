@@ -82,7 +82,7 @@ static int32_t	shade_hit(const t_scene *scene, t_hit hit, t_ray ray)
 {
 	t_color	amb;
 	t_color	diff;
-	//t_color	spec;
+	//t_color	spec; specular reflection, its bonus and doesnt seem to work too well right now so idk
 	t_color	accum;
 
 	amb = compute_ambient(&scene->ambient, hit.color);

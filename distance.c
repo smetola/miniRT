@@ -89,20 +89,6 @@ t_hit	get_sphere_hit(t_ray line, const t_sphere sphere)
 
 t_hit	get_plane_hit(t_ray line, const t_plane plane)
 {
-	//taken from https://stackoverflow.com/questions/7168484/3d-line-segment-and-plane-intersection
-	/*float	d;
-
-	if (vec_dot(plane.ori, line.direction) == 0) //paralelo al plano, nunca intersecan. esto incluye el caso de que el vector es parte del plano todo epsilon compare
-		return ((t_hit){0});
-	d = vec_dot(plane.ori, plane.coord); //todos los puntos X del plano cumplen la ecuacion vec_dot(plane.normal, X) = d
-	float x = (d - vec_dot(plane.ori, line.origin)) / vec_dot(plane.ori, line.direction);
-	t_vec3	hit = vec_add(line.origin, vec_scale(line.direction, x));
-	if (!is_point_ahead(line, hit)) //behind the screen, not valid
-		return ((t_hit){0});
-	t_vec3	normal = plane.ori;
-	if (point_to_plane_distance(line.origin, plane) < 0)
-		normal = vec_reverse(normal);
-	return	((t_hit){1, x, plane.color, normal, (t_vec3){0}, (t_vec3){0}, (t_vec3){0}});*/
 	if (vec_dot(plane.ori, line.direction) == 0)
 		return ((t_hit){0});
 	//todo if the signs of the 2 division terms are not different (- and +, or + and -), resulting t will be negative, meaning there would be no reason to divide, return empty hit
@@ -127,14 +113,18 @@ t_hit	get_infinite_cylinder_hit(t_ray line, const t_cylinder cylinder)
 	t_vec3		v;
 	t_hit		hit;
 
+	if (!vec_dot(line.direction, cylinder.ori)) //todo epsilon compare
+		return ((t_hit){0});
+	
+	hit.is_hit = 0;
+	hit.color = cylinder.color;
+
 	v = vec_sub(line.origin, cylinder.coord); //X = O-C
 	a = vec_dot(line.direction, line.direction) - pow(vec_dot(line.direction, cylinder.ori), 2);
-	b = vec_dot(line.direction, v) - vec_dot(line.direction, cylinder.ori) * vec_dot(v, cylinder.ori); //technically this is b/2, its simpler for quadratic equation
+	b = vec_dot(line.direction, v) - vec_dot(line.direction, cylinder.ori) * vec_dot(v, cylinder.ori); //this is b/2
 	b *= 2;
 	c = vec_dot(v, v) - pow(vec_dot(v, cylinder.ori), 2) - (cylinder.diam * cylinder.diam * 0.25); //last number is equal to r^2, todo precomputation
 
-	hit.is_hit = 0;
-	hit.color = cylinder.color;
 	delta = b * b - 4 * a * c;
 	if (delta < 0)
 		return ((t_hit){0});
@@ -155,14 +145,14 @@ t_hit	get_infinite_cylinder_hit(t_ray line, const t_cylinder cylinder)
 	hit.is_hit = 1;
 	if ((h1 < 0 || h1 > cylinder.hgt) || (h2 >= 0 && h2 <= cylinder.hgt && (t2 < t1)))
 	{
-		t1 = t2;
+		t1 = t2; //make sure hit is saved in t1/h1
 		h1 = h2;
 	}
 	hit.distance = t1;
 	u = ray_distance(line.origin, line.direction, t1);
 	hit.surface_normal = vec_normalize(vec_sub(u, vec_sub(cylinder.coord, vec_scale(cylinder.ori, h1)))); //todo normalize by diving with cylinder radius instead? less expensive operation
-	//if (??)
-	//	hit.surface_normal = vec_reverse(hit.surface_normal); //reverse normal if inside the cylinder
+	if (vec_dot(line.direction, vec_sub(u, ray_distance(cylinder.coord, cylinder.ori, h1))) > 0) //todo fully check if this works for camera inside cylinder
+		hit.surface_normal = vec_reverse(hit.surface_normal); //reverse normal if inside the cylinder
 	return (hit);
 }
 

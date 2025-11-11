@@ -95,27 +95,7 @@ t_vec3	rotate_rodrigues(t_vec3 target, t_vec3 axis, double angle)
 	return (vec_add(term1, vec_add(term2, term3)));
 }
 
-/*t_ray	vec_rotate_by_plane(t_ray target, t_plane plane)
-{
-	//rodrigues formula
-	target.origin = rotate_rodrigues(target.origin, plane.rotation_axis, plane.rotation_angle);
-	target.direction = rotate_rodrigues(target.direction, plane.rotation_axis, plane.rotation_angle);
-	return (target);
-}*/
-
-/*t_ray	vec_cylinder_rotate(t_ray target, t_cylinder cylinder, int reverse)
-{
-	//rodrigues formula
-	double	angle = cylinder.rotation_angle;
-	if (reverse)
-		angle = -angle;
-	target.origin = rotate_rodrigues(vec_sub(target.origin, cylinder.coord), cylinder.rotation_axis, angle);
-	//target.origin = rotate_rodrigues(target.origin, axis, angle);
-	target.direction = rotate_rodrigues(target.direction, cylinder.rotation_axis, angle);
-	return (target);
-}*/
-
-t_ray	vec_camera_rotate(t_ray target, t_camera camera)
+t_ray	vec_camera_rotate(t_ray target, t_camera camera) //todo do proper testing, revert back to santi version if it doesnt work
 {
 	//rodrigues formula
 	target.origin = rotate_rodrigues(vec_sub(target.origin, camera.coord), camera.rotation_axis, camera.rotation_angle);
