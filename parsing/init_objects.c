@@ -20,6 +20,7 @@ int	init_sphere(char *line, t_scene *scene)
 {
 	char		**split;
 	t_sphere	*new_spheres;
+	t_sphere	*sp;
 
 	split = ft_split(line, ' ');
 	if (!split || !split[0] || !split[1] || !split[2])
@@ -28,10 +29,12 @@ int	init_sphere(char *line, t_scene *scene)
 			scene->num_spheres + 1, sizeof(t_sphere)); //todo check if line is valid before realloc
 	if (!new_spheres)
 		return (0);
-	new_spheres[scene->num_spheres].diam = ft_atof(split[1]);
-	if (!parse_vector(split[0], &new_spheres[scene->num_spheres].coord, 0)
-		|| !parse_color(split[2], &new_spheres[scene->num_spheres].color))
+	sp = &new_spheres[scene->num_spheres];
+	sp->diam = ft_atof(split[1]);
+	if (!parse_vector(split[0], &sp->coord, 0)
+		|| !parse_color(split[2], &sp->color))
 		return (0);
+	sp->radius_squared = sp->diam * sp->diam * 0.25;
 	scene->spheres = new_spheres;
 	scene->num_spheres++;
 	free_split(split);
@@ -85,6 +88,8 @@ int	init_cylinder(char *line, t_scene *scene)
 	cy->ori = vec_normalize(cy->ori);
 	if (!parse_color(split[4], &cy->color))
 		return (0);
+	cy->coord2 = ray_distance(cy->coord, cy->ori, cy->hgt); //center of the second base
+	cy->radius_squared = cy->diam * cy->diam * 0.25;
 	scene->cylinders = new_cylinders;
 	scene->num_cylinders++;
 	free_split(split);

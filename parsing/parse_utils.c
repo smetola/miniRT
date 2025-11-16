@@ -69,7 +69,7 @@ int	parse_color(char *str, t_color *color)
 	return (1);
 }
 
-double	ft_atof(char *str)
+double	ft_atof(char *str) //todo most results need to be constrained to positive values
 {
 	double	result;
 	double	fraction;

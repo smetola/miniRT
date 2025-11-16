@@ -42,7 +42,7 @@ int32_t	main(int argc, char **argv)
 		puts(mlx_strerror(mlx_errno));
 		return (EXIT_FAILURE);
 	}
-	render_scene(&scene);
+	render_scene(scene);
 	mlx_loop_hook(mlx, ft_hook, mlx);
 	mlx_loop(mlx);
 	mlx_terminate(mlx);

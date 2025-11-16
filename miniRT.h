@@ -73,6 +73,7 @@ typedef struct s_sphere
 {
 	t_vec3	coord;
 	double	diam;
+	double	radius_squared;
 	t_color	color;
 }	t_sphere;
 
@@ -86,8 +87,10 @@ typedef struct s_plane
 typedef struct s_cylinder
 {
 	t_vec3	coord;
+	t_vec3	coord2;
 	t_vec3	ori;
 	double	diam;
+	double	radius_squared;
 	double	hgt;
 	t_color	color;
 }	t_cylinder;
@@ -131,7 +134,6 @@ double	ft_atof(char *str);
 
 /* color helpers (Santi) */
 t_color	color_add(t_color c1, t_color c2);
-t_color	color_sub(t_color c1, t_color c2);
 t_color	color_prod(t_color c1, t_color c2);
 t_color	color_scale(t_color c, double s);
 
@@ -150,26 +152,22 @@ int		is_empty_vec(t_vec3 v);
 t_vec3	reflect_vector(t_vec3 target, t_vec3 normal);
 t_vec3	rotate_rodrigues(t_vec3 target, t_vec3 axis, double angle);
 
-t_hit	get_sphere_hit(t_ray line, const t_sphere sphere);
-t_hit	get_plane_hit(t_ray line, const t_plane plane);
-t_hit	get_cylinder_hit(const t_ray line, const t_cylinder cylinder);
+t_hit	get_sphere_hit(t_ray ray, const t_sphere sphere);
+t_hit	get_plane_hit(t_ray ray, const t_plane plane);
+t_hit	get_cylinder_hit(const t_ray ray, const t_cylinder cylinder);
 
-t_ray	vec_rotate_by_plane(t_ray target, t_plane plane);
-t_ray	vec_cylinder_rotate(t_ray target, t_cylinder cylinder, int reverse);
-t_ray	vec_camera_rotate(t_ray target, t_camera camera);
+t_ray	vec_camera_rotate(t_ray target, t_camera camera); //todo testing
 
 /* Santi's shading helpers (updated to take pointers to scene) */
 t_vec3	get_hit_point(t_ray ray, double t);
-t_vec3	get_normal_at_sphere(t_vec3 point, t_sphere *sphere);
-t_color	compute_ambient(const t_amb_light *amb, t_color col);
-t_color	compute_diffuse(const t_scene *scene, t_color obj_color, t_vec3 normal, t_vec3 hit_point);
-t_color	compute_specular(const t_scene *scene, t_color obj_color, t_vec3 normal, t_vec3 hit_point);
+t_color	compute_ambient(const t_amb_light amb, t_color col);
+t_color	compute_diffuse(const t_scene scene, t_color obj_color, t_vec3 normal, t_vec3 hit_point);
+t_color	compute_specular(const t_scene scene, t_color obj_color, t_vec3 normal, t_vec3 hit_point);
 
 /* ray + render */
-int		hit_sphere(t_ray ray, const t_sphere s, double *t_out);
 t_ray	generate_ray(int x, int y, t_camera cam);
-t_hit	get_ray_hit(const int x, const int y, const t_scene *scene);
-void	render_scene(const t_scene *scene);
+t_hit	get_ray_hit(const t_ray ray, const t_scene scene);
+void	render_scene(const t_scene scene);
 
 t_vec3	ray_distance(t_vec3 start, t_vec3 direction, double distance);
 
