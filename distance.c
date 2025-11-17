@@ -104,59 +104,75 @@ t_hit	get_plane_hit(t_ray ray, const t_plane plane)
 	return	((t_hit){1, d, plane.color, normal, (t_vec3){0}, (t_vec3){0}, (t_vec3){0}});
 }
 
-t_hit	get_infinite_cylinder_hit(t_ray ray, const t_cylinder cylinder)
+int	solve_cylinder_quadratic(t_ray ray, t_cylinder cylinder, double *t1, double *t2)
 {
+	t_vec3		oc;
 	double	a;
 	double	b;
 	double	c;
-	double	delta;
+
+	oc = vec_sub(ray.origin, cylinder.coord);
+	a = vec_dot(ray.direction, ray.direction) - pow(vec_dot(ray.direction, cylinder.ori), 2);
+	b = vec_dot(ray.direction, oc) - vec_dot(ray.direction, cylinder.ori) * vec_dot(oc, cylinder.ori); //this is b/2
+	b *= 2;
+	c = vec_dot(oc, oc) - pow(vec_dot(oc, cylinder.ori), 2) - cylinder.radius_squared;
+
+	c = b * b - 4 * a * c; //this is delta, recycling c variable
+	if (c < 0)
+		return (0);
+	*t1 = (-b - sqrt(c)) / (a * 2);
+	*t2 = (-b + sqrt(c)) / (a * 2);
+	if (*t1 <= EPSILON && *t2 <= EPSILON)
+		return (0);
+	return (1);
+}
+
+double	get_cylinder_body_distance(t_ray ray, t_cylinder cylinder, double *h1)
+{
+	t_vec3		oc;
 	double	t1;
 	double	t2;
-	double	h1;
 	double	h2;
+
+	if (!solve_cylinder_quadratic(ray, cylinder, &t1, &t2))
+		return (-1);
+	oc = vec_sub(ray.origin, cylinder.coord);
+	if (t1 <= EPSILON)
+		*h1 = -1;
+	else
+		*h1 = vec_dot(ray.direction, cylinder.ori) * t1 + vec_dot(oc, cylinder.ori);
+	if (t2 <= EPSILON)
+		h2 = -1;
+	else
+		h2 = vec_dot(ray.direction, cylinder.ori) * t2 + vec_dot(oc, cylinder.ori);
+	if ((h2 < 0 || h2 > cylinder.hgt) && (*h1 < 0 || *h1 > cylinder.hgt))
+		return (-1);
+	if ((*h1 < 0 || *h1 > cylinder.hgt) || (h2 >= 0 && h2 <= cylinder.hgt && (t2 < t1)))
+	{
+		*h1 = h2;
+		return (t2);
+	}
+	return (t1);
+}
+
+t_hit	get_cylinder_body_hit(t_ray ray, const t_cylinder cylinder)
+{
+	double	height;
 	t_vec3		u;
-	t_vec3		v;
 	t_hit		hit;
 
-	if (!vec_dot(ray.direction, cylinder.ori)) //todo epsilon compare
+	if (!vec_dot(ray.direction, cylinder.ori)) //parallel to cylinder axis todo epsilon compare
 		return ((t_hit){0});
 	
 	hit.is_hit = 0;
 	hit.color = cylinder.color;
-
-	v = vec_sub(ray.origin, cylinder.coord); //X = O-C
-	a = vec_dot(ray.direction, ray.direction) - pow(vec_dot(ray.direction, cylinder.ori), 2);
-	b = vec_dot(ray.direction, v) - vec_dot(ray.direction, cylinder.ori) * vec_dot(v, cylinder.ori); //this is b/2
-	b *= 2;
-	c = vec_dot(v, v) - pow(vec_dot(v, cylinder.ori), 2) - cylinder.radius_squared;
-
-	delta = b * b - 4 * a * c;
-	if (delta < 0)
-		return ((t_hit){0});
-	t1 = (-b - sqrt(delta)) / (a * 2);
-	t2 = (-b + sqrt(delta)) / (a * 2);
-	if (t1 <= EPSILON && t2 <= EPSILON)
-		return ((t_hit){0});
-	if (t1 <= EPSILON)
-		h1 = -1;
-	else
-		h1 = vec_dot(ray.direction, cylinder.ori)*t1 + vec_dot(v, cylinder.ori);
-	if (t2 <= EPSILON)
-		h2 = -1;
-	else
-		h2 = vec_dot(ray.direction, cylinder.ori)*t2 + vec_dot(v, cylinder.ori);
-	if ((h2 < 0 || h2 > cylinder.hgt) && (h1 < 0 || h1 > cylinder.hgt))
-		return ((t_hit){0});
+	hit.distance = get_cylinder_body_distance(ray, cylinder, &height);
+	if (hit.distance < 0)
+		return (hit);
 	hit.is_hit = 1;
-	if ((h1 < 0 || h1 > cylinder.hgt) || (h2 >= 0 && h2 <= cylinder.hgt && (t2 < t1)))
-	{
-		t1 = t2; //make sure hit is saved in t1/h1
-		h1 = h2;
-	}
-	hit.distance = t1;
-	u = ray_distance(ray.origin, ray.direction, t1);
-	hit.surface_normal = vec_sub(u, vec_sub(cylinder.coord, vec_scale(cylinder.ori, h1)));
-	if (vec_dot(ray.direction, vec_sub(u, ray_distance(cylinder.coord, cylinder.ori, h1))) > 0) //todo fully check if this works for camera inside cylinder
+	u = ray_distance(ray.origin, ray.direction, hit.distance);
+	hit.surface_normal = vec_sub(u, vec_sub(cylinder.coord, vec_scale(cylinder.ori, height)));
+	if (vec_dot(ray.direction, vec_sub(u, ray_distance(cylinder.coord, cylinder.ori, height))) > 0) //todo fully check if this works for camera inside cylinder
 		hit.surface_normal = vec_reverse(hit.surface_normal); //reverse normal if inside the cylinder
 	hit.surface_normal = vec_scale(hit.surface_normal, 2/cylinder.diam); //normalized dividing by cylinder radius
 	return (hit);
@@ -168,7 +184,7 @@ t_hit	get_cylinder_hit(t_ray ray, const t_cylinder cylinder)
 	t_hit	temp_hit;
 	result.is_hit = 0;
 	result.distance = INFINITY;
-	temp_hit = get_infinite_cylinder_hit(ray, cylinder);
+	temp_hit = get_cylinder_body_hit(ray, cylinder);
 	if (temp_hit.is_hit && temp_hit.distance < result.distance)
 		result = temp_hit;
 	temp_hit = get_plane_hit(ray, (t_plane){cylinder.coord, vec_reverse(cylinder.ori), cylinder.color});

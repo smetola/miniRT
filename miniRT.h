@@ -156,7 +156,7 @@ t_hit	get_sphere_hit(t_ray ray, const t_sphere sphere);
 t_hit	get_plane_hit(t_ray ray, const t_plane plane);
 t_hit	get_cylinder_hit(const t_ray ray, const t_cylinder cylinder);
 
-t_ray	vec_camera_rotate(t_ray target, t_camera camera); //todo testing
+t_ray	vec_camera_rotate(t_ray target, t_camera camera);
 
 /* Santi's shading helpers (updated to take pointers to scene) */
 t_vec3	get_hit_point(t_ray ray, double t);
