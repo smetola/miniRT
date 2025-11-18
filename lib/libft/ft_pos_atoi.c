@@ -25,26 +25,23 @@ static int	calculate_result(const char *str, unsigned int i)
 		result += str[i] - '0';
 		i ++;
 	}
+	if (str[i])
+		return (-1);
 	return (result);
 }
 
-int	ft_atoi(const char *str)
+int	ft_pos_atoi(const char *str)
 {
-	int				sign;
 	unsigned int	i;
 
-	sign = 1;
 	i = 0;
-	while (str[i] == ' ' || str[i] == '\t' || str[i] == '\n' || \
-		str[i] == '\f' || str[i] == '\v' || str[i] == '\r')
-		i ++;
 	if (str[i] == '+' || str[i] == '-')
 	{
 		if (str[i] == '-')
-			sign = -sign;
+			return (-1);
 		i ++;
 	}
 	if (str[i] >= '0' && str[i] <= '9')
-		return (calculate_result(str, i) * sign);
-	return (0);
+		return (calculate_result(str, i));
+	return (-1);
 }

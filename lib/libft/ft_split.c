@@ -33,7 +33,7 @@ char	*ft_strdup_cond(const char *src, char c)
 	if (!result)
 		return (NULL);
 	i = 0;
-	while (src[i] && src[i] != c)
+	while (src[i] && src[i] != c && !(src[i] == '\n' && src[i + 1] == '\0'))
 	{
 		result[i] = src[i];
 		i ++;

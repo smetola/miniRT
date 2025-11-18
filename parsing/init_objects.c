@@ -30,10 +30,9 @@ int	init_sphere(char *line, t_scene *scene)
 	if (!new_spheres)
 		return (0);
 	sp = &new_spheres[scene->num_spheres];
-	sp->diam = ft_atof(split[1]);
-	if (!parse_vector(split[0], &sp->coord, 0)
+	if (!ft_atof(&sp->diam, split[1]) || !parse_vector(split[0], &sp->coord, 0)
 		|| !parse_color(split[2], &sp->color))
-		return (0);
+		return (ft_error("Invalid sphere declaration"));
 	sp->radius_squared = sp->diam * sp->diam * 0.25;
 	scene->spheres = new_spheres;
 	scene->num_spheres++;
@@ -83,8 +82,8 @@ int	init_cylinder(char *line, t_scene *scene)
 	if (!parse_vector(split[0], &cy->coord, 0)
 		|| !parse_vector(split[1], &cy->ori, 1))
 		return (0);
-	cy->diam = ft_atof(split[2]);
-	cy->hgt = ft_atof(split[3]);
+	if (!ft_atof(&cy->diam, split[2]) || cy->diam <= 0 || !ft_atof(&cy->hgt, split[3]) || cy->hgt <= 0)
+		return(ft_error("Invalid cylinder declaration"));
 	cy->ori = vec_normalize(cy->ori);
 	if (!parse_color(split[4], &cy->color))
 		return (0);

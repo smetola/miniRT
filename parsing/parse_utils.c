@@ -21,9 +21,6 @@ void	init_scene(t_scene *scene)
 int	parse_vector(char *str, t_vec3 *vec, int is_vec)
 {
 	char	**split;
-	float	x;
-	float	y;
-	float	z;
 
 	split = ft_split(str, ',');
 	if (!split || !split[0] || !split[1] || !split[2] || split[3])
@@ -31,16 +28,16 @@ int	parse_vector(char *str, t_vec3 *vec, int is_vec)
 		free_split(split);
 		return (ft_error("Invalid vector format"));
 	}
-	x = ft_atof(split[0]);
-	y = ft_atof(split[1]);
-	z = ft_atof(split[2]);
+	if (!ft_atof(&vec->x, split[0]) || !ft_atof(&vec->y, split[1]) || !ft_atof(&vec->z, split[2])) {
+		free_split(split);
+		return (ft_error("Invalid vector format"));
+	}
 	free_split(split);
 	if (is_vec
-		&& (x < -1.0 || x > 1.0 || y < -1.0 || y > 1.0 || z < -1.0 || z > 1.0))
-		return (ft_error("Vector component out of range [-1,1]")); //todo error case for null direction vector?
-	vec->x = x;
-	vec->y = y;
-	vec->z = z;
+		&& (vec->x < -1.0 || vec->x > 1.0 || vec->y < -1.0 || vec->y > 1.0 || vec->z < -1.0 || vec->z > 1.0))
+		return (ft_error("Vector component out of range [-1,1]"));
+	if (is_vec && is_empty_vec(*vec))
+		return (ft_error("Vector cannot have length of 0"));
 	return (1);
 }
 
@@ -69,7 +66,7 @@ int	parse_color(char *str, t_color *color)
 	return (1);
 }
 
-double	ft_atof(char *str) //todo most results need to be constrained to positive values
+int	ft_atof(double *ret, char *str) //todo most results need to be constrained to positive values
 {
 	double	result;
 	double	fraction;
@@ -78,8 +75,10 @@ double	ft_atof(char *str) //todo most results need to be constrained to positive
 	result = 0.0;
 	fraction = 0.1;
 	sign = 1;
-	if (*str == '-' && ++str)
+	if (*str == '-')
 		sign = -1;
+	if (*str == '-' || *str == '+')
+		str++;
 	while (*str >= '0' && *str <= '9')
 	{
 		result = result * 10.0 + (*str - '0');
@@ -95,5 +94,8 @@ double	ft_atof(char *str) //todo most results need to be constrained to positive
 			str++;
 		}
 	}
-	return (result * sign);
+	if (*str)
+		return (0);
+	*ret = result * sign;
+	return (1);
 }

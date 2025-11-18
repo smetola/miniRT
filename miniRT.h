@@ -67,6 +67,7 @@ typedef struct s_light
 {
 	t_vec3	coord;
 	double	bright;
+	t_color	color; //unused, for file formatting purposes
 }	t_light;
 
 typedef struct s_sphere
@@ -130,7 +131,7 @@ int		parse_vector(char *str, t_vec3 *vec, int is_vec);
 int		ft_error(char *message);
 void	free_split(char **split);
 void	free_scene(t_scene *scene);
-double	ft_atof(char *str);
+int		ft_atof(double *ret, char *str);
 
 /* color helpers (Santi) */
 t_color	color_add(t_color c1, t_color c2);
