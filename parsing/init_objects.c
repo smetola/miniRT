@@ -23,7 +23,7 @@ int	init_sphere(char *line, t_scene *scene)
 	t_sphere	*sp;
 
 	split = ft_split(line, ' ');
-	if (!split || !split[0] || !split[1] || !split[2])
+	if (!split || !split[0] || !split[1] || !split[2] || split[3])
 		return (0);
 	new_spheres = realloc_array(scene->spheres, scene->num_spheres,
 			scene->num_spheres + 1, sizeof(t_sphere)); //todo check if line is valid before realloc
@@ -47,7 +47,7 @@ int	init_plane(char *line, t_scene *scene)
 	t_plane	*pl;
 
 	split = ft_split(line, ' ');
-	if (!split || !split[0] || !split[1] || !split[2])
+	if (!split || !split[0] || !split[1] || !split[2] || split[3])
 		return (ft_error("Invalid plane format"));
 	new_planes = realloc_array(scene->planes, scene->num_planes,
 			scene->num_planes + 1, sizeof(t_plane)); //todo check if line is valid before realloc
@@ -72,7 +72,7 @@ int	init_cylinder(char *line, t_scene *scene)
 	t_cylinder	*cy;
 
 	split = ft_split(line, ' ');
-	if (!split || !split[0] || !split[1] || !split[2] || !split[3] || !split[4])
+	if (!split || !split[0] || !split[1] || !split[2] || !split[3] || !split[4] || split[5])
 		return (ft_error("Invalid cylinder format"));
 	new_cylinders = realloc_array(scene->cylinders, scene->num_cylinders,
 			scene->num_cylinders + 1, sizeof(t_cylinder)); //todo check if line is valid before realloc

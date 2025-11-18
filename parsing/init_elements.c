@@ -7,7 +7,7 @@ int	init_ambient(char *line, t_scene *scene)
 	if (scene->ambient.ratio != -1.0)
 		return (ft_error("Multiple ambient light definitions"));
 	split = ft_split(line, ' ');
-	if (!split || !split[0] || !split[1])
+	if (!split || !split[0] || !split[1] || split[2])
 		return (ft_error("Invalid ambient light format"));//todo free_split?
 	if (!ft_atof(&scene->ambient.ratio, split[0]) || scene->ambient.ratio > 1 || scene->ambient.ratio < 0)
 		return (ft_error("Invalid ambient light intensity value")); //todo free_split?
@@ -27,7 +27,7 @@ int	init_camera(char *line, t_scene *scene)
 	if (scene->camera.fov != -1)
 		return (ft_error("Multiple camera definitions"));
 	split = ft_split(line, ' ');
-	if (!split || !split[0] || !split[1] || !split[2])
+	if (!split || !split[0] || !split[1] || !split[2] || split[3])
 		return (ft_error("Invalid camera format"));
 	if (!parse_vector(split[0], &scene->camera.coord, 0)
 		|| !parse_vector(split[1], &scene->camera.orient, 1))
@@ -53,7 +53,7 @@ int	init_light(char *line, t_scene *scene)
 	if (scene->has_light)
 		return (ft_error("Multiple light definitions"));
 	split = ft_split(line, ' ');
-	if (!split || !split[0] || !split[1] || !split[2])
+	if (!split || !split[0] || !split[1] || !split[2] || split[3])
 		return (ft_error("Invalid light format"));
 	if (!parse_vector(split[0], &scene->light.coord, 0))
 	{
