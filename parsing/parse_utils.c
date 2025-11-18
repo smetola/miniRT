@@ -1,22 +1,16 @@
-#include "../miniRT.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_utils.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: smetola <smetola@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/20 10:00:00 by smetola           #+#    #+#             */
+/*   Updated: 2023/09/20 10:00:00 by smetola          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-void	init_scene(t_scene *scene)
-{
-	scene->ambient.ratio = -1.0;
-	scene->ambient.color = (t_color){0, 0, 0};
-	scene->camera.coord = (t_vec3){0, 0, 0};
-	scene->camera.orient = (t_vec3){0, 0, 0};
-	scene->camera.fov = -1;
-	scene->light.coord = (t_vec3){0, 0, 0};
-	scene->light.bright = 0.0;
-	scene->has_light = 0;
-	scene->spheres = NULL;
-	scene->num_spheres = 0;
-	scene->planes = NULL;
-	scene->num_planes = 0;
-	scene->cylinders = NULL;
-	scene->num_cylinders = 0;
-}
+#include "../miniRT.h"
 
 int	parse_vector(char *str, t_vec3 *vec, int is_vec)
 {
@@ -35,9 +29,11 @@ int	parse_vector(char *str, t_vec3 *vec, int is_vec)
 	y = ft_atof(split[1]);
 	z = ft_atof(split[2]);
 	free_split(split);
-	if (is_vec
-		&& (x < -1.0 || x > 1.0 || y < -1.0 || y > 1.0 || z < -1.0 || z > 1.0))
-		return (ft_error("Vector component out of range [-1,1]")); //todo error case for null direction vector?
+	if (is_vec && (x < -1.0 || x > 1.0
+			|| y < -1.0 || y > 1.0 || z < -1.0 || z > 1.0))
+		return (ft_error("Vector component out of range [-1,1]"));
+	if (is_vec && x == 0.0 && y == 0.0 && z == 0.0)
+		return (ft_error("Direction vector cannot be null"));
 	vec->x = x;
 	vec->y = y;
 	vec->z = z;
