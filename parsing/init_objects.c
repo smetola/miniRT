@@ -44,7 +44,8 @@ int	init_sphere(char *line, t_scene *scene)
 	sp = &new_spheres[scene->num_spheres];
 	if (!ft_atof(&sp->diam, split[1]) || !parse_vector(split[0], &sp->coord, 0)
 		|| !parse_color(split[2], &sp->color))
-		return (free(new_spheres), free_split(split), ft_error("Invalid sphere declaration"));
+		return (free(new_spheres),
+			free_split(split), ft_error("Invalid sphere declaration"));
 	sp->radius_squared = sp->diam * sp->diam * 0.25;
 	scene->spheres = new_spheres;
 	scene->num_spheres++;
@@ -77,6 +78,13 @@ int	init_plane(char *line, t_scene *scene)
 	return (1);
 }
 
+static void	init_cylinder_aux(t_cylinder *cy)
+{
+	cy->ori = vec_normalize(cy->ori);
+	cy->coord2 = ray_distance(cy->coord, cy->ori, cy->hgt);
+	cy->radius_squared = cy->diam * cy->diam * 0.25;
+}
+
 int	init_cylinder(char *line, t_scene *scene)
 {
 	char		**split;
@@ -84,7 +92,8 @@ int	init_cylinder(char *line, t_scene *scene)
 	t_cylinder	*cy;
 
 	split = ft_split(line, ' ');
-	if (!split || !split[0] || !split[1] || !split[2] || !split[3] || !split[4] || split[5])
+	if (!split || !split[0] || !split[1] || !split[2]
+		|| !split[3] || !split[4] || split[5])
 		return (free_split(split), ft_error("Invalid cylinder format"));
 	new_cylinders = realloc_array(scene->cylinders, scene->num_cylinders,
 			scene->num_cylinders + 1, sizeof(t_cylinder));
@@ -94,13 +103,13 @@ int	init_cylinder(char *line, t_scene *scene)
 	if (!parse_vector(split[0], &cy->coord, 0)
 		|| !parse_vector(split[1], &cy->ori, 1))
 		return (free(new_cylinders), free_split(split), 0);
-	if (!ft_atof(&cy->diam, split[2]) || cy->diam <= 0 || !ft_atof(&cy->hgt, split[3]) || cy->hgt <= 0)
-		return(free(new_cylinders), free_split(split), ft_error("Invalid cylinder declaration"));
-	cy->ori = vec_normalize(cy->ori);
+	if (!ft_atof(&cy->diam, split[2]) || cy->diam <= 0
+		|| !ft_atof(&cy->hgt, split[3]) || cy->hgt <= 0)
+		return (free(new_cylinders),
+			free_split(split), ft_error("Invalid cylinder declaration"));
 	if (!parse_color(split[4], &cy->color))
 		return (free(new_cylinders), free_split(split), 0);
-	cy->coord2 = ray_distance(cy->coord, cy->ori, cy->hgt);
-	cy->radius_squared = cy->diam * cy->diam * 0.25;
+	init_cylinder_aux(cy);
 	return (scene->cylinders = new_cylinders, scene->num_cylinders++,
 		free_split(split), 1);
 }

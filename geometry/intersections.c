@@ -114,8 +114,7 @@ t_hit	get_cylinder_hit(t_ray ray, const t_cylinder cylinder)
 	temp_hit = get_plane_hit(ray, (t_plane){cylinder.coord2, cylinder.ori,
 			cylinder.color});
 	if (temp_hit.is_hit && temp_hit.distance < result.distance
-		&& dot_distance(ray_distance(cylinder.coord, cylinder.ori,
-				cylinder.hgt), ray_distance(ray.origin, ray.direction,
+		&& dot_distance(cylinder.coord2, ray_distance(ray.origin, ray.direction,
 				temp_hit.distance)) < cylinder.diam * 0.5)
 		result = temp_hit;
 	return (result);

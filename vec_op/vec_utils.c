@@ -12,6 +12,11 @@
 
 #include "miniRT.h"
 
+int	is_empty_vec(t_vec3 v)
+{
+	return (v.x == 0 && v.y == 0 && v.z == 0);
+}
+
 t_vec3	ray_distance(t_vec3 start, t_vec3 direction, double distance)
 {
 	return (vec_add(start, vec_scale(direction, distance)));

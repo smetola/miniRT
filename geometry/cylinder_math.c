@@ -23,9 +23,8 @@ int	solve_cylinder_quadratic(t_ray ray, t_cylinder cylinder,
 	oc = vec_sub(ray.origin, cylinder.coord);
 	a = vec_dot(ray.direction, ray.direction)
 		- pow(vec_dot(ray.direction, cylinder.ori), 2);
-	b = vec_dot(ray.direction, oc)
-		- vec_dot(ray.direction, cylinder.ori) * vec_dot(oc, cylinder.ori);
-	b *= 2;
+	b = 2 * (vec_dot(ray.direction, oc)
+		- vec_dot(ray.direction, cylinder.ori) * vec_dot(oc, cylinder.ori));
 	c = vec_dot(oc, oc) - pow(vec_dot(oc, cylinder.ori), 2)
 		- cylinder.radius_squared;
 	c = b * b - 4 * a * c;

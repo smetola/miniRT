@@ -12,8 +12,6 @@
 
 #include "miniRT.h"
 
-mlx_image_t	*g_image; //todo delete global var?
-
 static void	ft_hook(void *param)
 {
 	mlx_t	*mlx;
@@ -23,7 +21,7 @@ static void	ft_hook(void *param)
 		mlx_close_window(mlx);
 }
 
-static mlx_t	*init_mlx_window(void)
+static mlx_t	*init_mlx_window(mlx_image_t **g_image)
 {
 	mlx_t	*mlx;
 
@@ -33,14 +31,14 @@ static mlx_t	*init_mlx_window(void)
 		puts(mlx_strerror(mlx_errno));
 		return (NULL);
 	}
-	g_image = mlx_new_image(mlx, WIDTH, HEIGHT);
-	if (!g_image)
+	*g_image = mlx_new_image(mlx, WIDTH, HEIGHT);
+	if (!*g_image)
 	{
 		mlx_close_window(mlx);
 		puts(mlx_strerror(mlx_errno));
 		return (NULL);
 	}
-	if (mlx_image_to_window(mlx, g_image, 0, 0) == -1)
+	if (mlx_image_to_window(mlx, *g_image, 0, 0) == -1)
 	{
 		mlx_close_window(mlx);
 		puts(mlx_strerror(mlx_errno));
@@ -51,15 +49,16 @@ static mlx_t	*init_mlx_window(void)
 
 int32_t	main(int argc, char **argv)
 {
-	mlx_t	*mlx;
-	t_scene	scene;
+	mlx_t		*mlx;
+	mlx_image_t	*g_image;
+	t_scene		scene;
 
 	if (!check_args(argc, argv[1]) || !parse_rt_file(argv[1], &scene))
 		return (1);
-	mlx = init_mlx_window();
+	mlx = init_mlx_window(&g_image);
 	if (!mlx)
 		return (EXIT_FAILURE);
-	render_scene(scene);
+	render_scene(scene, g_image);
 	mlx_loop_hook(mlx, ft_hook, mlx);
 	mlx_loop(mlx);
 	mlx_terminate(mlx);

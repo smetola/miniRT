@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "miniRT.h"
-#include <float.h> /* DBL_MAX */
 
 int32_t	ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
 {
@@ -76,7 +75,7 @@ t_hit	get_ray_hit(const t_ray r, const t_scene scene)
 	return (result);
 }
 
-void	render_scene(const t_scene scene)
+void	render_scene(const t_scene scene, mlx_image_t *g_image)
 {
 	int			x;
 	int			y;

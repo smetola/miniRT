@@ -22,13 +22,16 @@ int	parse_vector(char *str, t_vec3 *vec, int is_vec)
 		free_split(split);
 		return (ft_error("Invalid vector format"));
 	}
-	if (!ft_atof(&vec->x, split[0]) || !ft_atof(&vec->y, split[1]) || !ft_atof(&vec->z, split[2])) {
+	if (!ft_atof(&vec->x, split[0])
+		|| !ft_atof(&vec->y, split[1]) || !ft_atof(&vec->z, split[2]))
+	{
 		free_split(split);
 		return (ft_error("Invalid vector format"));
 	}
 	free_split(split);
 	if (is_vec
-		&& (vec->x < -1.0 || vec->x > 1.0 || vec->y < -1.0 || vec->y > 1.0 || vec->z < -1.0 || vec->z > 1.0))
+		&& (vec->x < -1.0 || vec->x > 1.0
+			|| vec->y < -1.0 || vec->y > 1.0 || vec->z < -1.0 || vec->z > 1.0))
 		return (ft_error("Vector component out of range [-1,1]"));
 	if (is_vec && is_empty_vec(*vec))
 		return (ft_error("Direction vector cannot be null"));

@@ -33,8 +33,6 @@
 #  define M_PI 3.14159265358979323846
 # endif
 
-extern mlx_image_t	*g_image;
-
 typedef struct s_color
 {
 	int	r;
@@ -88,7 +86,6 @@ typedef struct s_sphere
 	double	diam;
 	double	radius_squared;
 	t_color	color;
-	double	radius_squared;
 }	t_sphere;
 
 typedef struct s_plane
@@ -107,8 +104,6 @@ typedef struct s_cylinder
 	double	radius_squared;
 	double	hgt;
 	t_color	color;
-	t_vec3	coord2;
-	double	radius_squared;
 }	t_cylinder;
 
 typedef struct s_ray
@@ -124,11 +119,11 @@ typedef struct s_scene
 	t_light		light;
 	int			has_light;
 	t_sphere	*spheres;
-	int			num_spheres;
+	size_t		num_spheres;
 	t_plane		*planes;
-	int			num_planes;
+	size_t		num_planes;
 	t_cylinder	*cylinders;
-	int			num_cylinders;
+	size_t		num_cylinders;
 }	t_scene;
 
 /* parsing and init (unchanged) */
@@ -161,6 +156,7 @@ t_vec3	vec_scale(t_vec3 v, double s);
 t_vec3	vec_prod(t_vec3 a, t_vec3 b);
 double	vec_dot(t_vec3 a, t_vec3 b);
 double	vec_length(t_vec3 v);
+int		is_empty_vec(t_vec3 v);
 double	dot_distance(t_vec3 a, t_vec3 b);
 t_vec3	reflect_vector(t_vec3 target, t_vec3 normal);
 t_vec3	rotate_rodrigues(t_vec3 target, t_vec3 axis, double angle);
@@ -189,6 +185,6 @@ int32_t	shade_hit(const t_scene scene, t_hit hit, t_ray ray);
 int32_t	ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a);
 t_ray	generate_ray(int x, int y, t_camera cam);
 t_hit	get_ray_hit(const t_ray r, const t_scene scene);
-void	render_scene(const t_scene scene);
+void	render_scene(const t_scene scene, mlx_image_t *g_image);
 
 #endif
