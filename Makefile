@@ -2,14 +2,17 @@ NAME = miniRT
 MLX_DIR = mlx42-codam
 
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra -I$(MLX_DIR)/include -Ilib/libft -lm
+CFLAGS = -Wall -Werror -Wextra -I. -I$(MLX_DIR)/include -Ilib/libft -lm
 LDFLAGS = -L$(MLX_DIR)/build -lmlx42 -lglfw -lXext -lX11 -lm -Llib/libft -lft
 
 HDRS = miniRT.h
-SRCS = main.c \
+SRCS = main.c free.c \
 		parsing/init_parse_rt.c parsing/init_elements.c \
-		parsing/init_objects.c parsing/parse_utils.c free.c \
-		ray.c vec_op.c distance.c color.c light.c render.c \
+		parsing/init_objects.c parsing/parse_utils.c \
+		vec_op/vec_op.c vec_op/vec_math.c vec_op/vec_utils.c \
+		rendering/render.c rendering/ray.c rendering/shading.c \
+		rendering/light.c rendering/color.c \
+		geometry/cylinder_math.c geometry/intersections.c \
 		gnl/get_next_line.c gnl/get_next_line_utils.c
 
 OBJS = $(SRCS:.c=.o)

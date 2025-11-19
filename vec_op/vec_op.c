@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   free.c                                             :+:      :+:    :+:   */
+/*   vec_op.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: smetola <smetola@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,35 +12,35 @@
 
 #include "miniRT.h"
 
-void	free_split(char **split)
+t_vec3	vec_normalize(t_vec3 v)
 {
-	int	i;
+	double	length;
 
-	if (!split)
-		return ;
-	i = 0;
-	while (split[i])
-	{
-		free(split[i]);
-		i++;
-	}
-	free(split);
+	length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+	if (length == 0)
+		return (v);
+	v.x /= length;
+	v.y /= length;
+	v.z /= length;
+	return (v);
 }
 
-void	free_scene(t_scene *scene)
+t_vec3	vec_add(t_vec3 a, t_vec3 b)
 {
-	if (scene->spheres)
-		free(scene->spheres);
-	if (scene->planes)
-		free(scene->planes);
-	if (scene->cylinders)
-		free(scene->cylinders);
+	return ((t_vec3){a.x + b.x, a.y + b.y, a.z + b.z});
 }
 
-int	ft_error(char *message)
+t_vec3	vec_sub(t_vec3 a, t_vec3 b)
 {
-	write(2, "Error\n", 6);
-	write(2, message, ft_strlen(message));
-	write(2, "\n", 1);
-	return (0);
+	return ((t_vec3){a.x - b.x, a.y - b.y, a.z - b.z});
+}
+
+t_vec3	vec_reverse(t_vec3 v)
+{
+	return ((t_vec3){-v.x, -v.y, -v.z});
+}
+
+t_vec3	vec_scale(t_vec3 v, double s)
+{
+	return ((t_vec3){v.x * s, v.y * s, v.z * s});
 }

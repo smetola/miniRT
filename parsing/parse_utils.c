@@ -1,22 +1,16 @@
-#include "../miniRT.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_utils.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: smetola <smetola@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/20 10:00:00 by smetola           #+#    #+#             */
+/*   Updated: 2023/09/20 10:00:00 by smetola          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-void	init_scene(t_scene *scene)
-{
-	scene->ambient.ratio = -1.0;
-	scene->ambient.color = (t_color){0, 0, 0};
-	scene->camera.coord = (t_vec3){0, 0, 0};
-	scene->camera.orient = (t_vec3){0, 0, 0};
-	scene->camera.fov = -1;
-	scene->light.coord = (t_vec3){0, 0, 0};
-	scene->light.bright = 0.0;
-	scene->has_light = 0;
-	scene->spheres = NULL;
-	scene->num_spheres = 0;
-	scene->planes = NULL;
-	scene->num_planes = 0;
-	scene->cylinders = NULL;
-	scene->num_cylinders = 0;
-}
+#include "../miniRT.h"
 
 int	parse_vector(char *str, t_vec3 *vec, int is_vec)
 {
@@ -37,7 +31,7 @@ int	parse_vector(char *str, t_vec3 *vec, int is_vec)
 		&& (vec->x < -1.0 || vec->x > 1.0 || vec->y < -1.0 || vec->y > 1.0 || vec->z < -1.0 || vec->z > 1.0))
 		return (ft_error("Vector component out of range [-1,1]"));
 	if (is_vec && is_empty_vec(*vec))
-		return (ft_error("Vector cannot have length of 0"));
+		return (ft_error("Direction vector cannot be null"));
 	return (1);
 }
 
@@ -54,9 +48,9 @@ int	parse_color(char *str, t_color *color)
 		free_split(split);
 		return (ft_error("Invalid RGB format"));
 	}
-	r = ft_atoi(split[0]);
-	g = ft_atoi(split[1]);
-	b = ft_atoi(split[2]);
+	r = ft_pos_atoi(split[0]);
+	g = ft_pos_atoi(split[1]);
+	b = ft_pos_atoi(split[2]);
 	free_split(split);
 	if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
 		return (ft_error("RGB value out of range (0-255)"));
@@ -66,7 +60,7 @@ int	parse_color(char *str, t_color *color)
 	return (1);
 }
 
-int	ft_atof(double *ret, char *str) //todo most results need to be constrained to positive values
+int	ft_atof(double *ret, char *str)
 {
 	double	result;
 	double	fraction;
