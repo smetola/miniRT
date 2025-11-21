@@ -63,14 +63,26 @@ int	parse_color(char *str, t_color *color)
 	return (1);
 }
 
+static void	process_decimal(char **str, double *result)
+{
+	double	fraction;
+
+	fraction = 0.1;
+	(*str)++;
+	while (**str >= '0' && **str <= '9')
+	{
+		*result += (**str - '0') * fraction;
+		fraction /= 10.0;
+		(*str)++;
+	}
+}
+
 int	ft_atof(double *ret, char *str)
 {
 	double	result;
-	double	fraction;
 	int		sign;
 
 	result = 0.0;
-	fraction = 0.1;
 	sign = 1;
 	if (*str == '-')
 		sign = -1;
@@ -82,15 +94,7 @@ int	ft_atof(double *ret, char *str)
 		str++;
 	}
 	if (*str == '.')
-	{
-		str++;
-		while (*str >= '0' && *str <= '9')
-		{
-			result += (*str - '0') * fraction;
-			fraction /= 10.0;
-			str++;
-		}
-	}
+		process_decimal(&str, &result);
 	if (*str)
 		return (0);
 	*ret = result * sign;

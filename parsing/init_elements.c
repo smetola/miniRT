@@ -75,7 +75,7 @@ int	init_light(char *line, t_scene *scene)
 	}
 	if (!ft_atof(&scene->light.bright, split[1])
 		|| scene->light.bright > 1 || scene->light.bright < 0)
-		return (ft_error("Invalid light brightness value"));
+		return (free_split(split), ft_error("Invalid light brightness value"));
 	scene->has_light = 1;
 	if (!parse_color(split[2], &scene->light.color))
 	{
