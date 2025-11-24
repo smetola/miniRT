@@ -1,0 +1,7 @@
+make functional test files
+//done make test files for bad format
+makefile rule for checking for leaks
+check camera from inside cylinder/sphere looks good
+epsilon comparisons in most checks in collision detection
+check camera rotation works good, otherwise revert to previous version
+use floats instead of doubles

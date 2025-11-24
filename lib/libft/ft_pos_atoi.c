@@ -14,8 +14,8 @@
 
 static int	calculate_result(const char *str, unsigned int i)
 {
-	int	result;
-	int	base;
+	long int	result;
+	int			base;
 
 	base = 10;
 	result = 0;
@@ -23,6 +23,8 @@ static int	calculate_result(const char *str, unsigned int i)
 	{
 		result *= base;
 		result += str[i] - '0';
+		if (result > __INT_MAX__)
+			return (-1);
 		i ++;
 	}
 	if (str[i])
