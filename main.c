@@ -53,13 +53,19 @@ int32_t	main(int argc, char **argv)
 	mlx_image_t	*g_image;
 	t_scene		scene;
 
+	scene.planes = NULL;
+	scene.num_planes = 0;
+	scene.spheres = NULL;
+	scene.num_spheres = 0;
+	scene.cylinders = NULL;
+	scene.num_cylinders = 0;
 	if (!check_args(argc, argv[1]) || !parse_rt_file(argv[1], &scene))
-		return (1);
+		return (free_scene(&scene), 1);
 	mlx = init_mlx_window(&g_image);
 	if (!mlx)
 		return (EXIT_FAILURE);
-	render_scene(scene, g_image);
 	mlx_loop_hook(mlx, ft_hook, mlx);
+	render_scene(scene, g_image);
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
 	free_scene(&scene);

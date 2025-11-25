@@ -74,17 +74,18 @@ int	parse_rt_file(char *filename, t_scene *scene)
 	if (fd < 0)
 		return (ft_error("Cannot open file"));
 	init_scene(scene);
-	line = get_next_line(fd);
+	line = get_next_line(fd, 0);
 	while (line != NULL)
 	{
 		if (!parse_line(line, scene))
 		{
 			free(line);
+			get_next_line(fd, 1);
 			close(fd);
 			return (0);
 		}
 		free(line);
-		line = get_next_line(fd);
+		line = get_next_line(fd, 0);
 	}
 	close(fd);
 	return (validate_scene(scene));

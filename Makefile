@@ -54,3 +54,11 @@ fclean: clean
 	if [ -d "$(MLX_DIR)/build" ]; then cd $(MLX_DIR)/build && make clean; fi
 
 re: fclean all
+
+norm:
+	norminette $(SRCS) $(LIBFT_DIR)
+
+leaks: $(NAME)
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --suppressions=valgrind_suppressions.supp ./$(NAME) scenes/error/template.rt
+
+.PHONY: all clean fclean re norm leaks

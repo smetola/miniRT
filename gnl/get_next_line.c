@@ -92,11 +92,13 @@ char	*ft_read(int fd, char *str)
 	return (str);
 }
 
-char	*get_next_line(int fd)
+char	*get_next_line(int fd, int free_local)
 {
 	static char	*text;
 	char		*line;
 
+	if (free_local)
+		return (free(text), NULL);
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (0);
 	text = ft_read(fd, text);

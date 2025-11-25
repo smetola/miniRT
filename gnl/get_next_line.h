@@ -31,6 +31,6 @@ char	*gnl_strchr(char *s, int c);
 char	*get_rest(char *str);
 char	*ft_get_line(char *str);
 char	*ft_read(int fd, char *str);
-char	*get_next_line(int fd);
+char	*get_next_line(int fd, int free_local);
 
 #endif
