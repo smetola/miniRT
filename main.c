@@ -53,12 +53,7 @@ int32_t	main(int argc, char **argv)
 	mlx_image_t	*g_image;
 	t_scene		scene;
 
-	scene.planes = NULL;
-	scene.num_planes = 0;
-	scene.spheres = NULL;
-	scene.num_spheres = 0;
-	scene.cylinders = NULL;
-	scene.num_cylinders = 0;
+	init_scene(&scene);
 	if (!check_args(argc, argv[1]) || !parse_rt_file(argv[1], &scene))
 		return (free_scene(&scene), 1);
 	mlx = init_mlx_window(&g_image);

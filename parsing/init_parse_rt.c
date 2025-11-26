@@ -73,7 +73,6 @@ int	parse_rt_file(char *filename, t_scene *scene)
 	fd = open(filename, O_RDONLY);
 	if (fd < 0)
 		return (ft_error("Cannot open file"));
-	init_scene(scene);
 	line = get_next_line(fd, 0);
 	while (line != NULL)
 	{
