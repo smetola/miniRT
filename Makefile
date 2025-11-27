@@ -59,6 +59,6 @@ norm:
 	norminette $(SRCS) $(LIBFT_DIR)
 
 leaks: $(NAME)
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --suppressions=valgrind_suppressions.supp ./$(NAME) scenes/error/template.rt
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --suppressions=valgrind_suppressions.supp ./$(NAME) scenes/sphere/spheres.rt
 
 .PHONY: all clean fclean re norm leaks
