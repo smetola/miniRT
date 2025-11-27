@@ -42,7 +42,7 @@ int	init_sphere(char *line, t_scene *scene)
 	if (!new_spheres)
 		return (free_split(0), 0);
 	sp = &new_spheres[scene->num_spheres];
-	if (!ft_atof(&sp->diam, split[1]) || sp->diam <= 0 //todo limit diam min to epsilon?
+	if (!ft_atof(&sp->diam, split[1]) || sp->diam <= 0
 		|| !parse_vector(split[0], &sp->coord, 0)
 		|| !parse_color(split[2], &sp->color))
 		return (free(new_spheres),

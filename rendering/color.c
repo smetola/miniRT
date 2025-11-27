@@ -19,10 +19,16 @@ t_color	color_add(t_color c1, t_color c2)
 	c1.g += c2.g;
 	if (c1.b > 255)
 		c1.b = 255;
+	else if (c1.b < 0)
+		c1.b = 0;
 	if (c1.r > 255)
 		c1.r = 255;
+	else if (c1.r < 0)
+		c1.r = 0;
 	if (c1.g > 255)
 		c1.g = 255;
+	else if (c1.g < 0)
+		c1.g = 0;
 	return (c1);
 }
 

@@ -51,6 +51,7 @@ int	init_camera(char *line, t_scene *scene)
 	free_split(split);
 	if (scene->camera.fov < 0 || scene->camera.fov > 180)
 		return (ft_error("Invalid camera FOV value"));
+	scene->camera.orient = vec_normalize(scene->camera.orient);
 	forward = (t_vec3){0, 0, 1};
 	scene->camera.rotation_axis = vec_normalize(
 			vec_prod(scene->camera.orient, forward));

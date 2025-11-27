@@ -95,10 +95,9 @@ t_color	compute_specular(const t_scene scene, t_color obj_color,
 	t_vec3	c_dir;
 	double	intensity;
 
-	if (is_in_shadow(scene, hit_point,
-			vec_normalize(vec_sub(scene.light.coord, hit_point))))
+	l_dir = vec_normalize(vec_sub(scene.light.coord, hit_point));
+	if (is_in_shadow(scene, hit_point, l_dir))
 		return ((t_color){0});
-	l_dir = vec_normalize(vec_sub(hit_point, scene.light.coord));
 	l_dir = reflect_vector(l_dir, normal);
 	c_dir = vec_normalize(vec_sub(hit_point, scene.camera.coord));
 	intensity = scene.light.bright * pow(vec_dot(l_dir, c_dir),
