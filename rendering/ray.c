@@ -28,8 +28,8 @@ t_ray	generate_ray(int x, int y, t_camera cam)
 	dir.x = u;
 	dir.y = v;
 	dir.z = FOCAL_LENGTH;
-	ray.direction = dir;
-	ray = vec_camera_rotate(ray, cam);
-	ray.direction = vec_normalize(ray.direction);
+	dir = rotate_rodrigues(dir,
+			cam.rotation_axis, cam.rotation_angle);
+	ray.direction = vec_normalize(dir);
 	return (ray);
 }

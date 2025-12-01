@@ -66,8 +66,8 @@ t_hit	get_ray_hit(const t_ray r, const t_scene scene)
 	check_all_objects(r, scene, &result, &min_dist);
 	if (result.is_hit)
 	{
-		hitp = get_hit_point(r, result.distance);
-		result.camera_dir = vec_normalize(vec_sub(scene.camera.coord, hitp));
+		hitp = get_hit_point(r, result.distance); //todo add to hit struct?
+		result.camera_dir = vec_normalize(vec_sub(scene.camera.coord, hitp)); //todo full_hit struct? only calculate after confirming its not in shadow
 		result.light_dir = vec_normalize(vec_sub(scene.light.coord, hitp));
 		result.reflection_dir = reflect_vector(vec_reverse(result.light_dir),
 				result.surface_normal);

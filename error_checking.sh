@@ -2,6 +2,7 @@
 
 scenes="$(find scenes/error -type f -name '*.rt')"
 for scene in ${scenes}; do
+    echo "Testing $scene"
     valgrind --error-exitcode=2 ./miniRT "$scene" &>temp
     status=$?
     if [ $status -eq 2 ]; then

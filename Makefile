@@ -2,8 +2,8 @@ NAME = miniRT
 MLX_DIR = mlx42-codam
 
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra -I. -I$(MLX_DIR)/include -Ilib/libft -lm
-LDFLAGS = -L$(MLX_DIR)/build -lmlx42 -lglfw -lXext -lX11 -lm -Llib/libft -lft
+CFLAGS = -Wall -Werror -Wextra -I. -I$(MLX_DIR)/include -Ilib/libft -lm #-fsanitize=address
+LDFLAGS = -L$(MLX_DIR)/build -lmlx42 -lglfw -lXext -lX11 -lm -Llib/libft -lft #-fsanitize=address
 
 HDRS = miniRT.h
 SRCS = main.c free.c \
@@ -56,9 +56,6 @@ fclean: clean
 re: fclean all
 
 norm:
-	norminette $(SRCS) $(LIBFT_DIR)
-
-leaks: $(NAME)
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --suppressions=valgrind_suppressions.supp ./$(NAME) scenes/sphere/spheres.rt
+	norminette $(SRCS) $(HDRS) $(LIBFT_DIR)
 
 .PHONY: all clean fclean re norm leaks

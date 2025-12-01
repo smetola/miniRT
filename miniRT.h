@@ -27,7 +27,7 @@
 # define HEIGHT 512
 # define EPSILON 0.001
 # define FOCAL_LENGTH 1
-# define REFLECTION_INTENSITY 30 //cuanto mas alto, mas baja la intensidad. en 100 el reflejo es un punto pequeño, y en 1 o menos casi todo es blanco
+# define REFLECTION_INTENSITY 30
 
 # ifndef M_PI
 #  define M_PI 3.14159265358979323846
@@ -161,7 +161,6 @@ double	dot_distance(t_vec3 a, t_vec3 b);
 t_vec3	reflect_vector(t_vec3 target, t_vec3 normal);
 t_vec3	rotate_rodrigues(t_vec3 target, t_vec3 axis, double angle);
 t_vec3	ray_distance(t_vec3 start, t_vec3 direction, double distance);
-t_ray	vec_camera_rotate(t_ray target, t_camera camera);
 
 /* distance calculations */
 int		solve_cylinder_quadratic(t_ray ray, t_cylinder cylinder,
@@ -175,10 +174,8 @@ t_hit	get_cylinder_hit(const t_ray ray, const t_cylinder cylinder);
 /* shading and lighting */
 t_vec3	get_hit_point(t_ray ray, double t);
 t_color	compute_ambient(const t_amb_light amb, t_color col);
-t_color	compute_diffuse(const t_scene scene, t_color obj_color,
-			t_vec3 normal, t_vec3 hit_point);
-t_color	compute_specular(const t_scene scene, t_color obj_color,
-			t_vec3 normal, t_vec3 hit_point);
+t_color	compute_diffuse(const t_scene scene, t_hit hit);
+t_color	compute_specular(const t_scene scene, t_hit hit);
 int32_t	shade_hit(const t_scene scene, t_hit hit, t_ray ray);
 
 /* ray + render */
