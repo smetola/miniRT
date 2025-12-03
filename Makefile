@@ -1,4 +1,5 @@
 NAME = miniRT
+NAME_BONUS = bonusRT
 MLX_DIR = mlx42-codam
 
 CC = gcc
@@ -23,10 +24,13 @@ LIBFT = $(LIBFT_DIR)/libft.a
 MLX_BUILD = $(MLX_DIR)/build/Makefile
 MLX_LIB = $(MLX_DIR)/build/libmlx42.a
 
-all: $(LIBFT) $(MLX_LIB) $(NAME)
+all: $(NAME) $(NAME_BONUS)
 
 $(NAME): $(HDRS) $(OBJS) $(LIBFT) $(MLX_LIB)
 	$(CC) $(OBJS) $(LDFLAGS) -o $(NAME)
+
+$(NAME_BONUS): $(HDRS) $(SRCS) $(LIBFT) $(MLX_LIB)
+	$(CC) -D BONUS $(SRCS) $(CFLAGS) $(LDFLAGS) -o $(NAME_BONUS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -49,13 +53,13 @@ clean:
 	if [ -d "$(MLX_DIR)/build" ]; then cd $(MLX_DIR)/build && make clean; fi
 
 fclean: clean
-	rm -f $(NAME)
+	rm -f $(NAME) $(NAME_BONUS)
 	$(MAKE) -C $(LIBFT_DIR) fclean
 	if [ -d "$(MLX_DIR)/build" ]; then cd $(MLX_DIR)/build && make clean; fi
 
 re: fclean all
 
-norm:
+norm: $(SRCS) $(HDRS) $(LIBFT_DIR)
 	norminette $(SRCS) $(HDRS) $(LIBFT_DIR)
 
-.PHONY: all clean fclean re norm leaks
+.PHONY: all clean fclean re norm

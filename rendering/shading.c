@@ -60,7 +60,7 @@ t_vec3	reflect_vector(t_vec3 target, t_vec3 normal)
 	double	dot_prod;
 
 	dot_prod = vec_dot(target, normal);
-	return (vec_normalize(vec_sub(target, vec_scale(normal, 2 * dot_prod))));
+	return (vec_normalize(vec_sub(vec_scale(normal, 2 * dot_prod), target)));
 }
 
 int32_t	shade_hit(const t_scene scene, t_hit hit, t_ray ray)
@@ -73,9 +73,14 @@ int32_t	shade_hit(const t_scene scene, t_hit hit, t_ray ray)
 	amb = compute_ambient(scene.ambient, hit.color);
 	if (!is_in_shadow(scene, get_hit_point(ray, hit.distance), hit.light_dir))
 	{
-		diff = compute_diffuse(scene, hit);
-		spec = compute_specular(scene, hit); //todo compile 2 executables, regular one without and bonus with specular
-		amb = color_add(amb, color_add(diff, spec));
+		if (BONUS)
+		{
+			diff = compute_diffuse(scene, hit);
+			spec = compute_specular(scene, hit);
+			amb = color_add(amb, color_add(diff, spec));
+		}
+		else
+			amb = color_add(amb, compute_diffuse(scene, hit));
 	}
 	return (ft_pixel(amb.r, amb.g, amb.b, 255));
 }

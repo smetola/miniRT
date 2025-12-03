@@ -27,10 +27,14 @@
 # define HEIGHT 512
 # define EPSILON 0.001
 # define FOCAL_LENGTH 1
-# define REFLECTION_INTENSITY 30
+# define REFLECTION_INTENSITY 200
 
 # ifndef M_PI
 #  define M_PI 3.14159265358979323846
+# endif
+
+# ifndef BONUS
+#  define BONUS 0
 # endif
 
 typedef struct s_color
