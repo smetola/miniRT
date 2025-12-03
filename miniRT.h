@@ -48,6 +48,9 @@ typedef struct s_ambient_lighting
 {
 	double		ratio;
 	t_color		color;
+	double		r_ratio;
+	double		g_ratio;
+	double		b_ratio;
 }	t_amb_light;
 
 typedef struct s_vec3
@@ -63,9 +66,8 @@ typedef struct s_hit
 	double	distance;
 	t_color	color;
 	t_vec3	surface_normal;
-	t_vec3	camera_dir;
+	t_vec3	hitpoint;
 	t_vec3	light_dir;
-	t_vec3	reflection_dir;
 }	t_hit;
 
 typedef struct s_camera
@@ -180,7 +182,7 @@ t_vec3	get_hit_point(t_ray ray, double t);
 t_color	compute_ambient(const t_amb_light amb, t_color col);
 t_color	compute_diffuse(const t_scene scene, t_hit hit);
 t_color	compute_specular(const t_scene scene, t_hit hit);
-int32_t	shade_hit(const t_scene scene, t_hit hit, t_ray ray);
+int32_t	shade_hit(const t_scene scene, t_hit hit);
 
 /* ray + render */
 int32_t	ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a);

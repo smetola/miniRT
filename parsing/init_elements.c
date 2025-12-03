@@ -31,6 +31,12 @@ int	init_ambient(char *line, t_scene *scene)
 		return (0);
 	}
 	free_split(split);
+	scene->ambient.r_ratio = scene->ambient.ratio
+		* (scene->ambient.color.r / 255.0);
+	scene->ambient.g_ratio = scene->ambient.ratio
+		* (scene->ambient.color.g / 255.0);
+	scene->ambient.b_ratio = scene->ambient.ratio
+		* (scene->ambient.color.b / 255.0);
 	return (1);
 }
 

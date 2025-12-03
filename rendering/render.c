@@ -59,18 +59,15 @@ t_hit	get_ray_hit(const t_ray r, const t_scene scene)
 {
 	t_hit	result;
 	double	min_dist;
-	t_vec3	hitp;
 
 	result.is_hit = 0;
 	min_dist = INFINITY;
 	check_all_objects(r, scene, &result, &min_dist);
 	if (result.is_hit)
 	{
-		hitp = get_hit_point(r, result.distance); //todo add to hit struct?
-		result.camera_dir = vec_normalize(vec_sub(scene.camera.coord, hitp)); //todo full_hit struct? only calculate after confirming its not in shadow
-		result.light_dir = vec_normalize(vec_sub(scene.light.coord, hitp));
-		result.reflection_dir = reflect_vector(result.light_dir,
-				result.surface_normal);
+		result.hitpoint = get_hit_point(r, result.distance);
+		result.light_dir = vec_normalize(
+				vec_sub(scene.light.coord, result.hitpoint));
 	}
 	return (result);
 }
@@ -94,7 +91,7 @@ void	render_scene(const t_scene scene, mlx_image_t *g_image)
 			if (!hit.is_hit)
 				color = ft_pixel(0, 0, 0, 255);
 			else
-				color = shade_hit(scene, hit, r);
+				color = shade_hit(scene, hit);
 			mlx_put_pixel(g_image, x, y, color);
 			x++;
 		}

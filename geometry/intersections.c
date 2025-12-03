@@ -47,7 +47,7 @@ t_hit	get_sphere_hit(t_ray ray, const t_sphere sphere)
 	}
 	return ((t_hit){1, t_out, sphere.color,
 		calculate_sphere_normal(ray, t_out, sphere),
-		(t_vec3){0}, (t_vec3){0}, (t_vec3){0}});
+		(t_vec3){0}, (t_vec3){0}});
 }
 
 t_hit	get_plane_hit(t_ray ray, const t_plane plane)
@@ -67,8 +67,7 @@ t_hit	get_plane_hit(t_ray ray, const t_plane plane)
 	normal = plane.ori;
 	if (vec_dot(ray.direction, plane.ori) > 0)
 		normal = vec_reverse(normal);
-	return ((t_hit){1, d, plane.color, normal, (t_vec3){0}, (t_vec3){0},
-		(t_vec3){0}});
+	return ((t_hit){1, d, plane.color, normal, (t_vec3){0}, (t_vec3){0}});
 }
 
 t_hit	get_cylinder_body_hit(t_ray ray, const t_cylinder cylinder)

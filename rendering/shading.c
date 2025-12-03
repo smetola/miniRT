@@ -63,15 +63,14 @@ t_vec3	reflect_vector(t_vec3 target, t_vec3 normal)
 	return (vec_normalize(vec_sub(vec_scale(normal, 2 * dot_prod), target)));
 }
 
-int32_t	shade_hit(const t_scene scene, t_hit hit, t_ray ray)
+int32_t	shade_hit(const t_scene scene, t_hit hit)
 {
 	t_color	amb;
 	t_color	diff;
 	t_color	spec;
-	//t_vec3	hitp; //todo add to hit struct? make a second struct with this and the other 3 properties? also add them only after checking hit point is not in shadow
 
 	amb = compute_ambient(scene.ambient, hit.color);
-	if (!is_in_shadow(scene, get_hit_point(ray, hit.distance), hit.light_dir))
+	if (!is_in_shadow(scene, hit.hitpoint, hit.light_dir))
 	{
 		if (BONUS)
 		{
