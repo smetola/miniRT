@@ -3,7 +3,7 @@ NAME_BONUS = bonusRT
 MLX_DIR = mlx42-codam
 
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra -I. -I$(MLX_DIR)/include -Ilib/libft -lm #-fsanitize=address
+CFLAGS = -Wall -Werror -Wextra -I. -I$(MLX_DIR)/include -Ilib/libft #-fsanitize=address
 LDFLAGS = -L$(MLX_DIR)/build -lmlx42 -lglfw -lXext -lX11 -lm -Llib/libft -lft #-fsanitize=address
 
 HDRS = miniRT.h

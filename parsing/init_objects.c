@@ -40,15 +40,14 @@ int	init_sphere(char *line, t_scene *scene)
 	new_spheres = realloc_array(scene->spheres, scene->num_spheres,
 			scene->num_spheres + 1, sizeof(t_sphere));
 	if (!new_spheres)
-		return (free_split(0), 0);
+		return (free_split(split), 0);
+	scene->spheres = new_spheres;
 	sp = &new_spheres[scene->num_spheres];
 	if (!ft_atof(&sp->diam, split[1]) || sp->diam <= 0
 		|| !parse_vector(split[0], &sp->coord, 0)
 		|| !parse_color(split[2], &sp->color))
-		return (free(new_spheres),
-			free_split(split), ft_error("Invalid sphere declaration"));
+		return (free_split(split), ft_error("Invalid sphere declaration"));
 	sp->radius_squared = sp->diam * sp->diam * 0.25;
-	scene->spheres = new_spheres;
 	scene->num_spheres++;
 	free_split(split);
 	return (1);
@@ -67,14 +66,14 @@ int	init_plane(char *line, t_scene *scene)
 			scene->num_planes + 1, sizeof(t_plane));
 	if (!new_planes)
 		return (free_split(split), 0);
+	scene->planes = new_planes;
 	pl = &new_planes[scene->num_planes];
 	if (!parse_vector(split[0], &pl->coord, 0)
 		|| !parse_vector(split[1], &pl->ori, 1)
 		|| !parse_color(split[2], &pl->color))
-		return (free(new_planes), free_split(split),
+		return (free_split(split),
 			ft_error("Invalid plane declaration"));
 	pl->ori = vec_normalize(pl->ori);
-	scene->planes = new_planes;
 	scene->num_planes++;
 	free_split(split);
 	return (1);
@@ -101,15 +100,15 @@ int	init_cylinder(char *line, t_scene *scene)
 			scene->num_cylinders + 1, sizeof(t_cylinder));
 	if (!new_cylinders)
 		return (free_split(split), 0);
+	scene->cylinders = new_cylinders;
 	cy = &new_cylinders[scene->num_cylinders];
 	if (!parse_vector(split[0], &cy->coord, 0)
 		|| !parse_vector(split[1], &cy->ori, 1)
 		|| !ft_atof(&cy->diam, split[2]) || cy->diam <= 0
 		|| !ft_atof(&cy->hgt, split[3]) || cy->hgt <= 0
 		|| !parse_color(split[4], &cy->color))
-		return (free(new_cylinders),
-			free_split(split), ft_error("Invalid cylinder declaration"));
+		return (free_split(split), ft_error("Invalid cylinder declaration"));
 	init_cylinder_aux(cy);
-	return (scene->cylinders = new_cylinders, scene->num_cylinders++,
+	return (scene->num_cylinders++,
 		free_split(split), 1);
 }

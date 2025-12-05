@@ -6,7 +6,7 @@
 /*   By: ubuntuser <ubuntuser@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 10:00:00 by smetola           #+#    #+#             */
-/*   Updated: 2025/11/17 21:39:04 by ubuntuser        ###   ########.fr       */
+/*   Updated: 2025/12/05 23:54:28 by ubuntuser        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ int32_t	main(int argc, char **argv)
 		return (free_scene(&scene), 1);
 	mlx = init_mlx_window(&g_image);
 	if (!mlx)
-		return (EXIT_FAILURE);
+		return (free_scene(&scene), EXIT_FAILURE);
 	mlx_loop_hook(mlx, ft_hook, mlx);
 	render_scene(scene, g_image);
 	mlx_loop(mlx);
