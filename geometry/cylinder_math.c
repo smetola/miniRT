@@ -6,7 +6,7 @@
 /*   By: ubuntuser <ubuntuser@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 10:00:00 by smetola           #+#    #+#             */
-/*   Updated: 2025/11/21 18:09:09 by ubuntuser        ###   ########.fr       */
+/*   Updated: 2025/12/05 23:54:23 by ubuntuser        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int	solve_cylinder_quadratic(t_ray ray, t_cylinder cylinder,
 	c = vec_dot(oc, oc) - pow(vec_dot(oc, cylinder.ori), 2)
 		- cylinder.radius_squared;
 	c = b * b - 4 * a * c;
-	if (c < 0)
+	if (c < 0 || a == 0)
 		return (0);
 	*t1 = (-b - sqrt(c)) / (a * 2);
 	*t2 = (-b + sqrt(c)) / (a * 2);
