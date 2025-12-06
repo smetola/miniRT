@@ -55,10 +55,10 @@ int32_t	main(int argc, char **argv)
 
 	init_scene(&scene);
 	if (!check_args(argc, argv[1]) || !parse_rt_file(argv[1], &scene))
-		return (free_scene(&scene), 1);
+		return (free_scene(&scene), EXIT_FAILURE);
 	mlx = init_mlx_window(&g_image);
 	if (!mlx)
-		return (EXIT_FAILURE);
+		return (free_scene(&scene), EXIT_FAILURE);
 	mlx_loop_hook(mlx, ft_hook, mlx);
 	render_scene(scene, g_image);
 	mlx_loop(mlx);
