@@ -1,6 +1,6 @@
 # 🔦 miniRT - My First Raytracer
 
-**miniRT** es mi primer motor gráfico construido desde cero en **C**. El objetivo: generar imágenes 3D realistas simulando la física de la luz mediante la técnica de **Raytracing**.
+**miniRT** es mi primer motor gráfico construido desde cero en **C**</br>El objetivo: generar imágenes 3D realistas simulando la física de la luz mediante la técnica de **Raytracing**
 
 <p align="center">
   <img width="1697" height="850" alt="minirtscenes" src="https://github.com/user-attachments/assets/99eb3101-560e-4634-b5b5-8ec5755ad7e3" />
@@ -42,8 +42,8 @@ Este proyecto ha sido el desafío matemático más grande hasta la fecha en el c
 El programa lee archivos de configuración simples para montar la escena:
 
 ```text
-A 0.2 255,255,255          # Luz Ambiente
+A 0.2 255,255,255          # Luz Ambiente (Intensidad, Color)
 C -50,0,20 0,0,1 70        # Cámara (Posición, Orientación, FOV)
-L -40,0,30 0.7 255,255,255 # Luz Puntual
-sp 0,0,20 20 255,0,0       # Esfera Roja
-cy 50,0,20.6 0,0,1 14.2 21.42 10,0,255 # Cilindro Azul
+L -40,0,30 0.7 255,255,255 # Luz Puntual (Posición, Intensidad, Color)
+sp 0,0,20 20 255,0,0       # Esfera Roja (Posición, Radio, Color)
+cy 50,0,20.6 0,0,1 14.2 21.42 10,0,255 # Cilindro Azul (Posición, Orientación, Radio, Altura, Color)
