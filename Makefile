@@ -24,7 +24,7 @@ LIBFT = $(LIBFT_DIR)/libft.a
 MLX_BUILD = $(MLX_DIR)/build/Makefile
 MLX_LIB = $(MLX_DIR)/build/libmlx42.a
 
-all: $(NAME) $(NAME_BONUS)
+all: $(MLX_DIR) $(NAME) $(NAME_BONUS)
 
 $(NAME): $(HDRS) $(OBJS) $(LIBFT) $(MLX_LIB)
 	$(CC) $(OBJS) $(LDFLAGS) -o $(NAME)
