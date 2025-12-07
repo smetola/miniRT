@@ -1,4 +1,4 @@
-# 🔦 miniRT - My First Raytracer
+# 🔦 miniRT
 
 **miniRT** es mi primer motor gráfico construido desde cero en **C**</br>El objetivo: generar imágenes 3D realistas simulando la física de la luz mediante la técnica de **Raytracing**
 
